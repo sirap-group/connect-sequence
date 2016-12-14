@@ -1,0 +1,26 @@
+{
+  "name": "connect-sequence",
+  "version": "0.1.0",
+  "description": "A node.js module to run connect-like middlewares in sequence",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sirap-group/connect-sequence.git"
+  },
+  "keywords": [
+    "node",
+    "node.js",
+    "connect",
+    "middleware",
+    "express"
+  ],
+  "author": "Rémi Becheras <rbecheras@sirap.fr>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sirap-group/connect-sequence/issues"
+  },
+  "homepage": "https://github.com/sirap-group/connect-sequence#readme"
+}
