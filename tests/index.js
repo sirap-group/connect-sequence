@@ -27,4 +27,35 @@ describe('connectSequence.run(req, res, next, middlewares)', function () {
 
     expect(_req.output).to.equal('initialNext')
   })
+
+  it('should run all the middlewares in the passed array of middlewares', function () {
+    var _req = {
+      ids: []
+    }
+    var _res = {}
+    var _next = function (req, res, next) {
+      req.ids.push('initial')
+    }
+    var first = function (req, res, next) {
+      req.ids.push('first')
+    }
+    var second = function (req, res, next) {
+      req.ids.push('second')
+    }
+    var third = function (req, res, next) {
+      req.ids.push('third')
+    }
+    var fourth = function (req, res, next) {
+      req.ids.push('fourth')
+    }
+    var mids = [first, second, third, fourth]
+
+    connectSequence.run(_req, _res, _next, mids)
+
+    expect(_req.ids).to.contain('initial')
+    expect(_req.ids).to.contain('first')
+    expect(_req.ids).to.contain('second')
+    expect(_req.ids).to.contain('third')
+    expect(_req.ids).to.contain('fourth')
+  })
 })
