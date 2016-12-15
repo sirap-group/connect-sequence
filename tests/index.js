@@ -8,8 +8,8 @@ var describe = global.describe
 var it = global.it
 var expect = chai.expect
 
-describe('Connect-Sequence', function () {
-  it('run() should run the initial next middleware at last', function () {
+describe('connectSequence.run(req, res, next, middlewares)', function () {
+  it('should run the initial next middleware at last', function () {
     var _req = {}
     var _res = {}
     var _next = function (req, res, next) {
@@ -23,7 +23,8 @@ describe('Connect-Sequence', function () {
     var fourth = first
     var mids = [first, second, third, fourth]
 
-    connectSequence.run(mids, _req, _res, _next)
+    connectSequence.run(_req, _res, _next, mids)
+
     expect(_req.output).to.equal('initialNext')
   })
 })
