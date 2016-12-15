@@ -8,12 +8,13 @@ var describe = global.describe
 var it = global.it
 var expect = chai.expect
 
-describe('connectSequence.run(req, res, next, middlewares)', function () {
+describe('connectSequence.run()', function () {
   it('should run the initial next middleware at last', function () {
     var _req = {}
     var _res = {}
-    var _next = function (req, res, next) {
+    var _next = function (req, res) {
       req.output = 'initialNext'
+      expect(req.output).to.equal('initialNext')
     }
     var first = function (req, res, next) {
       req.output = 'first'
@@ -24,8 +25,6 @@ describe('connectSequence.run(req, res, next, middlewares)', function () {
     var mids = [first, second, third, fourth]
 
     connectSequence.run(_req, _res, _next, mids)
-
-    expect(_req.output).to.equal('initialNext')
   })
 
   it('should run all the middlewares in the passed array of middlewares', function () {
@@ -33,8 +32,13 @@ describe('connectSequence.run(req, res, next, middlewares)', function () {
       ids: []
     }
     var _res = {}
-    var _next = function (req, res, next) {
+    var _next = function (req, res) {
       req.ids.push('initial')
+      expect(req.ids).to.contain('initial')
+      expect(req.ids).to.contain('first')
+      expect(req.ids).to.contain('second')
+      expect(req.ids).to.contain('third')
+      expect(req.ids).to.contain('fourth')
     }
     var first = function (req, res, next) {
       req.ids.push('first')
@@ -51,12 +55,6 @@ describe('connectSequence.run(req, res, next, middlewares)', function () {
     var mids = [first, second, third, fourth]
 
     connectSequence.run(_req, _res, _next, mids)
-
-    expect(_req.ids).to.contain('initial')
-    expect(_req.ids).to.contain('first')
-    expect(_req.ids).to.contain('second')
-    expect(_req.ids).to.contain('third')
-    expect(_req.ids).to.contain('fourth')
   })
 
   it('should run all the middlewares in the same order than the given array', function () {
@@ -64,8 +62,9 @@ describe('connectSequence.run(req, res, next, middlewares)', function () {
       ids: []
     }
     var _res = {}
-    var _next = function (req, res, next) {
+    var _next = function (req, res) {
       req.ids.push('last')
+      expect(req.ids.join()).to.equal('first,second,third,fourth,last')
     }
     var first = function (req, res, next) {
       req.ids.push('first')
@@ -82,8 +81,6 @@ describe('connectSequence.run(req, res, next, middlewares)', function () {
     var mids = [first, second, third, fourth]
 
     connectSequence.run(_req, _res, _next, mids)
-
-    expect(_req.ids.join()).to.equal('first,second,third,fourth,last')
   })
 
   it('should run each middleware as a callback of the previous', function () {
