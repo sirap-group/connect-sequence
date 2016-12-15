@@ -22,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/sirap-group/connect-sequence/issues"
   },
-  "homepage": "https://github.com/sirap-group/connect-sequence#readme"
+  "homepage": "https://github.com/sirap-group/connect-sequence#readme",
+  "devDependencies": {
+    "chai": "^3.5.0"
+  }
 }
