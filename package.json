@@ -4,7 +4,7 @@
   "description": "A node.js module to run connect-like middlewares in sequence",
   "main": "index.js",
   "scripts": {
-    "test": "npm run test"
+    "test": "mocha tests --watch"
   },
   "repository": {
     "type": "git",
