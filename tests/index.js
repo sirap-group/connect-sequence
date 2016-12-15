@@ -85,4 +85,44 @@ describe('connectSequence.run(req, res, next, middlewares)', function () {
 
     expect(_req.ids.join()).to.equal('first,second,third,fourth,last')
   })
+
+  it('should run each middleware as a callback of the previous', function () {
+    var _req = {
+      ids: []
+    }
+    var _res = {}
+    var _next = function (req, res) {
+      if (req && req.ids) {
+        req.ids.push('last')
+        expect(req.ids.join()).to.equal('first,second,third,fourth,last')
+      }
+    }
+    var first = function (req, res, next) {
+      setTimeout(function () {
+        req.ids.push('first')
+        next()
+      }, 150)
+    }
+    var second = function (req, res, next) {
+      setTimeout(function () {
+        req.ids.push('second')
+        next()
+      }, 50)
+    }
+    var third = function (req, res, next) {
+      setTimeout(function () {
+        req.ids.push('third')
+        next()
+      }, 100)
+    }
+    var fourth = function (req, res, next) {
+      setTimeout(function () {
+        req.ids.push('fourth')
+        next()
+      }, 150)
+    }
+    var mids = [first, second, third, fourth]
+
+    connectSequence.run(_req, _res, _next, mids)
+  })
 })
