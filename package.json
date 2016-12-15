@@ -25,6 +25,7 @@
   "homepage": "https://github.com/sirap-group/connect-sequence#readme",
   "devDependencies": {
     "chai": "^3.5.0",
-    "gulp": "^3.9.1"
+    "gulp": "^3.9.1",
+    "gulp-mocha": "^3.0.1"
   }
 }
