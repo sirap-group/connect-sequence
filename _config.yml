@@ -1,0 +1,8 @@
+title: Connect-sequence
+description: A node.js module to run connect-like middlewares in sequence
+google_analytics: 
+show_downloads: true
+theme: jekyll-theme-architect
+
+gems:
+  - jekyll-mentions
