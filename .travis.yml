@@ -4,5 +4,7 @@ node_js:
   - lts/boron
 before_script:
   - npm install -g gulp-cli
+  - npm install -g jscover
 script:
   - npm test
+  - npm run coverage
