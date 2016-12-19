@@ -53,3 +53,7 @@ gulp.task('bump', function () {
 })
 
 gulp.task('default', ['test'])
+
+gulp.task('watch', function () {
+  gulp.watch([ './tests/**/*.js', './lib/**/*.js' ], ['test'])
+})
