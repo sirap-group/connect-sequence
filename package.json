@@ -4,7 +4,8 @@
   "description": "A node.js module to run connect-like middlewares in sequence",
   "main": "index.js",
   "scripts": {
-    "test": "gulp test"
+    "test": "gulp test",
+    "coverage": "gulp coverage"
   },
   "repository": {
     "type": "git",
