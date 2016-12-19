@@ -29,12 +29,12 @@ This is super cool but **sometimes, we would want to register the middleware seq
 
 You'll find connect-sequence on these platforms:
 
-- Github.io: https://sirap-group.github.io/connect-sequence
-- Github.com: https://github.com/sirap-group/connect-sequence
-- npmjs.com: https://www.npmjs.com/package/connect-sequence
-- Libraries.io: https://libraries.io/npm/connect-sequence
-- Travic CI: https://travis-ci.org/sirap-group/connect-sequence
-- Coveralls.io: https://coveralls.io/github/sirap-group/connect-sequence
+- Github.io: [https://sirap-group.github.io/connect-sequence](https://sirap-group.github.io/connect-sequence)
+- Github.com: [https://github.com/sirap-group/connect-sequence](https://github.com/sirap-group/connect-sequence)
+- npmjs.com: [https://www.npmjs.com/package/connect-sequence](https://www.npmjs.com/package/connect-sequence)
+- Libraries.io: [https://libraries.io/npm/connect-sequence](https://libraries.io/npm/connect-sequence)
+- Travic CI: [https://travis-ci.org/sirap-group/connect-sequence](https://travis-ci.org/sirap-group/connect-sequence)
+- Coveralls.io: [https://coveralls.io/github/sirap-group/connect-sequence](https://coveralls.io/github/sirap-group/connect-sequence)
 
 > [Suscribe to new releases on libraries.io!](https://libraries.io/subscribe/2033386)
 
