@@ -115,6 +115,7 @@ function productRouter (app) {
 ## Credits
 
 - Rémi Becheras (https://github.com/rbecheras)
+- Groupe SIRAP (https://github.com/sirap-group)
 
 ## Copyright
 
