@@ -112,6 +112,25 @@ function productRouter (app) {
 }
 ```
 
+## Contribute
+
+[![JavaScript Style Guide](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
+
+The javascript source files are located in the `lib` folder and the unit test files are located in the `tests` folder.
+
+We use the [Standard Javascript Code Style](http://standardjs.com/) to keep the code clean and nice.
+
+We use [Gulp](http://gulpjs.com/) some gulp plugins and some other node modules as `devDependendies` to automate the developement tasks:
+
+- [gulp-standard-bundle](https://github.com/ggarciao/gulp-standard-bundle) to lint all the javascript source files against the javascript syntax and the StandardJS code style,
+- [grunt-mocha](https://github.com/sindresorhus/gulp-mocha) and [chaijs](https://github.com/chaijs/chai) to make and run the unit tests,
+- [gulp-coverage](https://github.com/dylanb/gulp-coverage) and [gulp-coveralls](https://github.com/markdalgleish/gulp-coveralls) to compute and publish the testing coverage of the code,
+- [gulp-bump](https://github.com/stevelacy/gulp-bump) and [gulp-git](https://github.com/stevelacy/gulp-git) to tag the patch, minor and major releases.
+
+Finally, we use the [Semver 2.0](http://semver.org/) (Semantic Versioning) to standardize the release version numbers (major/minor/path/pre-release).
+
+> Your contributions posting issues and pull requests are welcome!
+
 ## Credits
 
 - Rémi Becheras (https://github.com/rbecheras)
