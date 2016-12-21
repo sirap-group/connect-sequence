@@ -8,6 +8,7 @@ var shell = require('gulp-shell')
 var cover = require('gulp-coverage')
 var coveralls = require('gulp-coveralls')
 var bump = require('gulp-bump')
+var git = require('gulp-git')
 
 var linter = standard.linter
 var argv = yargs.argv
@@ -42,14 +43,21 @@ gulp.task('coverage', ['jscover'], function () {
 
 gulp.task('bump', function () {
   var opts = {}
-  opts.type = argv.patch
-    ? 'patch' : (argv.minor)
-      ? 'minor' : (argv.major)
-        ? 'major' : (argv.prerelease)
-          ? 'prerelease' : 'patch'
+  opts.type = getBumpType()
   return gulp.src('./package.json')
   .pipe(bump(opts))
   .pipe(gulp.dest('./'))
+})
+
+gulp.task('release', ['bump'], function () {
+  var pkg = require('./package.json')
+  var version = pkg.version
+  var releaseType = getBumpType()
+  var commitMsg = 'Releasing ' + releaseType + ' version: v' + version
+  gulp.src('./package.json')
+  .pipe(git.add())
+  .pipe(git.commit(commitMsg))
+  .pipe(git.push('gh-sirap-group', '2-create-a-release-task'))
 })
 
 gulp.task('default', ['test'])
@@ -57,3 +65,11 @@ gulp.task('default', ['test'])
 gulp.task('watch', function () {
   gulp.watch([ './tests/**/*.js', './lib/**/*.js' ], ['test'])
 })
+
+function getBumpType () {
+  return argv.patch
+  ? 'patch' : (argv.minor)
+  ? 'minor' : (argv.major)
+  ? 'major' : (argv.prerelease)
+  ? 'prerelease' : 'patch'
+}
