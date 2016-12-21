@@ -37,6 +37,26 @@ You'll find connect-sequence on these platforms:
 
 > [Suscribe to new releases on libraries.io!](https://libraries.io/subscribe/2033386)
 
+## Installation
+
+### With node package manager (recommanded)
+
+    npm install --save connect-sequence
+
+### Or manually
+
+Download:
+
+    wget https://github.com/sirap-group/connect-sequence/archive/v1.0.0.zip
+
+Extract:
+
+    unzip v1.0.0.zip
+
+Move in the `node_modules` directory:
+
+    mv connect-sequence ./node_modules/connect-sequence
+
 ## Usage
 
 > **Important Note:**
@@ -90,30 +110,7 @@ function productRouter (app) {
     // ... yield the product by ID and bind it to the req object
   })
 }
-
-
-
 ```
-
-## Installation
-
-### With node package manager (recommanded)
-
-    npm install --save connect-sequence
-
-### Or manually
-
-Download:
-
-    wget https://github.com/sirap-group/connect-sequence/archive/v1.0.0.zip
-
-Extract:
-
-    unzip v1.0.0.zip
-
-Move in the `node_modules` directory:
-
-    mv connect-sequence ./node_modules/connect-sequence
 
 ## Credits
 
