@@ -62,7 +62,7 @@ gulp.task('release', ['bump'], function (done) {
       if (err) {
         throw err
       }
-      git.push('gh-sirap-group', null, done)
+      git.push('gh-sirap-group', null, {args: '--tags'}, done)
     })
   })
 })
