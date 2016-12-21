@@ -49,7 +49,7 @@ gulp.task('bump', function () {
   .pipe(gulp.dest('./'))
 })
 
-gulp.task('release', ['bump'], function () {
+gulp.task('release', ['bump'], function (done) {
   var pkg = require('./package.json')
   var version = pkg.version
   var releaseType = getBumpType()
@@ -57,7 +57,9 @@ gulp.task('release', ['bump'], function () {
   gulp.src('./package.json')
   .pipe(git.add())
   .pipe(git.commit(commitMsg))
-  .pipe(git.push('gh-sirap-group', '2-create-a-release-task'))
+  .on('end', function () {
+    git.push('gh-sirap-group', null, done)
+  })
 })
 
 gulp.task('default', ['test'])
