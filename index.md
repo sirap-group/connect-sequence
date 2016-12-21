@@ -1,17 +1,18 @@
-# connect-sequence
+# connect-sequence [![GitHub tag](https://img.shields.io/github/tag/sirap-group/connect-sequence.svg?maxAge=2592000?style=plastic)](git@github.com:sirap-group/connect-sequence.git) [![npm](https://img.shields.io/npm/v/connect-sequence.svg?maxAge=2592000?style=plastic)](https://www.npmjs.com/package/connect-sequence)
+
+[![NPM](https://nodei.co/npm/connect-sequence.png?compact=true)](https://nodei.co/npm/connect-sequence/)
 
 [![Build Status](https://travis-ci.org/sirap-group/connect-sequence.png)](https://travis-ci.org/sirap-group/connect-sequence)
 [![Coverage Status](https://coveralls.io/repos/github/sirap-group/connect-sequence/badge.svg?branch=master)](https://coveralls.io/github/sirap-group/connect-sequence?branch=master)
 ![NPM](https://david-dm.org/sirap-group/connect-sequence.svg)
 
-[![NPM](https://nodei.co/npm/connect-sequence.png?compact=true)](https://nodei.co/npm/connect-sequence/)
 
-[![GitHub tag](https://img.shields.io/github/tag/sirap-group/connect-sequence.svg?maxAge=2592000?style=plastic)](git@github.com:sirap-group/connect-sequence.git)
-[![npm](https://img.shields.io/npm/v/connect-sequence.svg?maxAge=2592000?style=plastic)](https://www.npmjs.com/package/connect-sequence)
 
 [![JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
 [![Semver 2.0](https://img.shields.io/badge/Versioning-Semver%202.0-brightgreen.svg)](http://semver.org/)
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg?maxAge=2592000?style=plastic)](https://github.com/sirap-group/connect-sequence)
+
+
 
 A node.js module to run connect-like middlewares in sequence
 
@@ -35,6 +36,26 @@ You'll find connect-sequence on these platforms:
 - Coveralls.io: [https://coveralls.io/github/sirap-group/connect-sequence](https://coveralls.io/github/sirap-group/connect-sequence)
 
 > [Suscribe to new releases on libraries.io!](https://libraries.io/subscribe/2033386)
+
+## Installation
+
+### With node package manager (recommanded)
+
+    npm install --save connect-sequence
+
+### Or manually
+
+Download:
+
+    wget https://github.com/sirap-group/connect-sequence/archive/v1.0.0.zip
+
+Extract:
+
+    unzip v1.0.0.zip
+
+Move in the `node_modules` directory:
+
+    mv connect-sequence ./node_modules/connect-sequence
 
 ## Usage
 
@@ -89,34 +110,31 @@ function productRouter (app) {
     // ... yield the product by ID and bind it to the req object
   })
 }
-
-
-
 ```
 
-## Installation
+## Contribute
 
-### With node package manager (recommanded)
+[![JavaScript Style Guide](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
 
-    npm install --save connect-sequence
+The javascript source files are located in the `lib` folder and the unit test files are located in the `tests` folder.
 
-### Or manually
+We use the [Standard Javascript Code Style](http://standardjs.com/) to keep the code clean and nice.
 
-Download:
+We use [Gulp](http://gulpjs.com/) some gulp plugins and some other node modules as `devDependendies` to automate the developement tasks:
 
-    wget https://github.com/sirap-group/connect-sequence/archive/v1.0.0.zip
+- [gulp-standard-bundle](https://github.com/ggarciao/gulp-standard-bundle) to lint all the javascript source files against the javascript syntax and the StandardJS code style,
+- [grunt-mocha](https://github.com/sindresorhus/gulp-mocha) and [chaijs](https://github.com/chaijs/chai) to make and run the unit tests,
+- [gulp-coverage](https://github.com/dylanb/gulp-coverage) and [gulp-coveralls](https://github.com/markdalgleish/gulp-coveralls) to compute and publish the testing coverage of the code,
+- [gulp-bump](https://github.com/stevelacy/gulp-bump) and [gulp-git](https://github.com/stevelacy/gulp-git) to tag the patch, minor and major releases.
 
-Extract:
+Finally, we use the [Semver 2.0](http://semver.org/) (Semantic Versioning) to standardize the release version numbers (major/minor/path/pre-release).
 
-    unzip v1.0.0.zip
-
-Move in the `node_modules` directory:
-
-    mv connect-sequence ./node_modules/connect-sequence
+> Your contributions posting issues and pull requests are welcome!
 
 ## Credits
 
 - Rémi Becheras (https://github.com/rbecheras)
+- Groupe SIRAP (https://github.com/sirap-group)
 
 ## Copyright
 
