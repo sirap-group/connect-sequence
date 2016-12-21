@@ -51,14 +51,19 @@ gulp.task('bump', function () {
 
 gulp.task('release', ['bump'], function (done) {
   var pkg = require('./package.json')
-  var version = pkg.version
+  var version = 'v' + pkg.version
   var releaseType = getBumpType()
-  var commitMsg = 'Releasing ' + releaseType + ' version: v' + version
+  var commitMsg = 'Releasing ' + releaseType + ' version: ' + version
   gulp.src('./package.json')
   .pipe(git.add())
   .pipe(git.commit(commitMsg))
   .on('end', function () {
-    git.push('gh-sirap-group', null, done)
+    git.tag(version, commitMsg, function (err) {
+      if (err) {
+        throw err
+      }
+      git.push('gh-sirap-group', null, done)
+    })
   })
 })
 
