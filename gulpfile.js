@@ -1,6 +1,7 @@
 var gulp = require('gulp')
 var yargs = require('yargs')
 var del = require('del')
+var chalk = require('chalk')
 
 var standard = require('gulp-standard-bundle')
 var mocha = require('gulp-mocha')
@@ -9,6 +10,7 @@ var cover = require('gulp-coverage')
 var coveralls = require('gulp-coveralls')
 var bump = require('gulp-bump')
 var git = require('gulp-git')
+var gitRev = require('git-rev')
 
 var linter = standard.linter
 var argv = yargs.argv
@@ -50,19 +52,27 @@ gulp.task('bump', function () {
 })
 
 gulp.task('release', ['bump'], function (done) {
-  var pkg = require('./package.json')
-  var version = 'v' + pkg.version
-  var releaseType = getBumpType()
-  var commitMsg = 'Releasing ' + releaseType + ' version: ' + version
-  gulp.src('./package.json')
-  .pipe(git.add())
-  .pipe(git.commit(commitMsg))
-  .on('end', function () {
-    git.tag(version, commitMsg, function (err) {
-      if (err) {
-        throw err
-      }
-      git.push('gh-sirap-group', null, {args: '--tags'}, done)
+  gitRev.branch(function (branch) {
+    if (branch !== 'master') {
+      var errorMsg = 'You must be on the master branch to make a new release!'
+      errorMsg += 'If you want to make a release candidate (RC), use the `prerelease` task instead.'
+      console.error(chalk.red.bgWhite(errorMsg))
+      return
+    }
+    var pkg = require('./package.json')
+    var version = 'v' + pkg.version
+    var releaseType = getBumpType()
+    var commitMsg = 'Releasing ' + releaseType + ' version: ' + version
+    gulp.src('./package.json')
+    .pipe(git.add())
+    .pipe(git.commit(commitMsg))
+    .on('end', function () {
+      git.tag(version, commitMsg, function (err) {
+        if (err) {
+          throw err
+        }
+        git.push('gh-sirap-group', null, {args: '--tags'}, done)
+      })
     })
   })
 })
