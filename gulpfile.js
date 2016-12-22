@@ -6,6 +6,7 @@ var chalk = require('chalk')
 var standard = require('gulp-standard-bundle')
 var mocha = require('gulp-mocha')
 var shell = require('gulp-shell')
+var childProcess = require('child_process')
 var cover = require('gulp-coverage')
 var coveralls = require('gulp-coveralls')
 var bump = require('gulp-bump')
@@ -76,10 +77,16 @@ gulp.task('release', ['bump'], function (done) {
         if (err) {
           throw err
         }
-        git.push('gh-sirap-group', null, {args: '--tags'}, done)
+        git.push('gh-sirap-group', null, function () {
+          git.push('gh-sirap-group', null, {args: '--tags'}, function () {
+            var exec = childProcess.exec('npm publish')
+            exec.stdout.pipe(process.stdout)
+            exec.stderr.pipe(process.stderr)
+            exec.on('end', done)
+          })
+        })
       })
     })
-    .pipe(shell(['npm publish'], {verbose: true}))
   })
 })
 
