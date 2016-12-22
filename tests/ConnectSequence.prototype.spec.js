@@ -12,4 +12,8 @@ describe('ConnectSequence', function () {
   it('should be a function', function () {
     expect(ConnectSequence).to.be.a('function')
   })
+
+  it('should contain the `run` static method', function () {
+    expect(ConnectSequence.run).to.be.a('function')
+  })
 })
