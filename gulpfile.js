@@ -1,6 +1,7 @@
 var gulp = require('gulp')
 var yargs = require('yargs')
 var del = require('del')
+var chalk = require('chalk')
 
 var standard = require('gulp-standard-bundle')
 var mocha = require('gulp-mocha')
@@ -8,6 +9,8 @@ var shell = require('gulp-shell')
 var cover = require('gulp-coverage')
 var coveralls = require('gulp-coveralls')
 var bump = require('gulp-bump')
+var git = require('gulp-git')
+var gitRev = require('git-rev')
 
 var linter = standard.linter
 var argv = yargs.argv
@@ -40,16 +43,43 @@ gulp.task('coverage', ['jscover'], function () {
   .pipe(coveralls())
 })
 
-gulp.task('bump', function () {
-  var opts = {}
-  opts.type = argv.patch
-    ? 'patch' : (argv.minor)
-      ? 'minor' : (argv.major)
-        ? 'major' : (argv.prerelease)
-          ? 'prerelease' : 'patch'
-  return gulp.src('./package.json')
-  .pipe(bump(opts))
-  .pipe(gulp.dest('./'))
+gulp.task('bump', function (done) {
+  releaseIfHeadOnMaster(function (err) {
+    if (err) {
+      done()
+      return
+    }
+    var opts = {}
+    opts.type = getBumpType()
+    return gulp.src('./package.json')
+    .pipe(bump(opts))
+    .pipe(gulp.dest('./'))
+    .on('end', done)
+  })
+})
+
+gulp.task('release', ['bump'], function (done) {
+  releaseIfHeadOnMaster(function (err) {
+    if (err) {
+      done()
+      return
+    }
+    var pkg = require('./package.json')
+    var version = 'v' + pkg.version
+    var releaseType = getBumpType()
+    var commitMsg = 'Releasing ' + releaseType + ' version: ' + version
+    gulp.src('./package.json')
+    .pipe(git.add())
+    .pipe(git.commit(commitMsg))
+    .on('end', function () {
+      git.tag(version, commitMsg, function (err) {
+        if (err) {
+          throw err
+        }
+        git.push('gh-sirap-group', null, {args: '--tags'}, done)
+      })
+    })
+  })
 })
 
 gulp.task('default', ['test'])
@@ -57,3 +87,25 @@ gulp.task('default', ['test'])
 gulp.task('watch', function () {
   gulp.watch([ './tests/**/*.js', './lib/**/*.js' ], ['test'])
 })
+
+function releaseIfHeadOnMaster (done) {
+  gitRev.branch(function (branch) {
+    if (branch !== 'master') {
+      var errorMsg = 'You must be on the master branch to make a new release!\n'
+      errorMsg += 'If you want to make a release candidate (RC), use the `prerelease` task instead.\n'
+      errorMsg += 'Tasks `release`... Aborting.'
+      console.error(chalk.red.bgWhite(errorMsg))
+      done(new Error())
+      return
+    }
+    done()
+  })
+}
+
+function getBumpType () {
+  return argv.patch
+  ? 'patch' : (argv.minor)
+  ? 'minor' : (argv.major)
+  ? 'major' : (argv.prerelease)
+  ? 'prerelease' : 'patch'
+}
