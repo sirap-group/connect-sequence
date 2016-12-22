@@ -2,13 +2,13 @@
 
 var path = require('path')
 var chai = require('chai')
-var connectSequence = require(path.resolve('./lib/connect-sequence'))
+var ConnectSequence = require(path.resolve('./lib/connect-sequence'))
 
 var describe = global.describe
 var it = global.it
 var expect = chai.expect
 
-describe('connectSequence.run()', function () {
+describe('ConnectSequence.run()', function () {
   it('should run the initial next middleware at last', function () {
     var _req = {}
     var _res = {}
@@ -24,7 +24,7 @@ describe('connectSequence.run()', function () {
     var fourth = first
     var mids = [first, second, third, fourth]
 
-    connectSequence.run(_req, _res, _next, mids)
+    ConnectSequence.run(_req, _res, _next, mids)
   })
 
   it('should run all the middlewares in the passed array of middlewares', function () {
@@ -54,7 +54,7 @@ describe('connectSequence.run()', function () {
     }
     var mids = [first, second, third, fourth]
 
-    connectSequence.run(_req, _res, _next, mids)
+    ConnectSequence.run(_req, _res, _next, mids)
   })
 
   it('should run all the middlewares in the same order than the given array', function () {
@@ -80,7 +80,7 @@ describe('connectSequence.run()', function () {
     }
     var mids = [first, second, third, fourth]
 
-    connectSequence.run(_req, _res, _next, mids)
+    ConnectSequence.run(_req, _res, _next, mids)
   })
 
   it('should run each middleware as a callback of the previous', function () {
@@ -120,6 +120,6 @@ describe('connectSequence.run()', function () {
     }
     var mids = [first, second, third, fourth]
 
-    connectSequence.run(_req, _res, _next, mids)
+    ConnectSequence.run(_req, _res, _next, mids)
   })
 })

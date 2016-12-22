@@ -25,7 +25,7 @@ gulp.task('lint', function () {
 })
 
 gulp.task('test', ['lint'], function () {
-  return gulp.src('./tests/connect-sequence.spec.js')
+  return gulp.src('./tests/**/*.spec.js')
   .pipe(mocha())
 })
 
