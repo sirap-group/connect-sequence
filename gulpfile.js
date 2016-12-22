@@ -79,6 +79,7 @@ gulp.task('release', ['bump'], function (done) {
         git.push('gh-sirap-group', null, {args: '--tags'}, done)
       })
     })
+    .pipe(shell(['npm publish'], {verbose: true}))
   })
 })
 
