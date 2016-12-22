@@ -77,8 +77,8 @@ gulp.task('release', ['bump'], function (done) {
         if (err) {
           throw err
         }
-        git.push('gh-sirap-group', null, function () {
-          git.push('gh-sirap-group', null, {args: '--tags'}, function () {
+        git.push('gh-sirap-group', null, {args: '--tags'}, function () {
+          git.push('gh-sirap-group', null, null, function () {
             var exec = childProcess.exec('npm publish')
             exec.stdout.pipe(process.stdout)
             exec.stderr.pipe(process.stderr)
