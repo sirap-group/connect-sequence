@@ -54,10 +54,11 @@ gulp.task('bump', function () {
 gulp.task('release', ['bump'], function (done) {
   gitRev.branch(function (branch) {
     if (branch !== 'master') {
-      var errorMsg = 'You must be on the master branch to make a new release!'
-      errorMsg += 'If you want to make a release candidate (RC), use the `prerelease` task instead.'
+      var errorMsg = 'You must be on the master branch to make a new release!\n'
+      errorMsg += 'If you want to make a release candidate (RC), use the `prerelease` task instead.\n'
+      errorMsg += 'Tasks `release`... Aborting.'
       console.error(chalk.red.bgWhite(errorMsg))
-      return
+      return done()
     }
     var pkg = require('./package.json')
     var version = 'v' + pkg.version
