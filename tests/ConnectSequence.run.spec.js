@@ -9,6 +9,10 @@ var it = global.it
 var expect = chai.expect
 
 describe('ConnectSequence.run()', function () {
+  it('should be a function', function () {
+    expect(ConnectSequence.run).to.be.a('function')
+  })
+
   it('should run the initial next middleware at last', function () {
     var _req = {}
     var _res = {}

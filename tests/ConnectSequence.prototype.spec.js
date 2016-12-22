@@ -13,7 +13,11 @@ describe('ConnectSequence', function () {
     expect(ConnectSequence).to.be.a('function')
   })
 
-  it('should contain the `run` static method', function () {
-    expect(ConnectSequence.run).to.be.a('function')
+  it('should contain the `run` property', function () {
+    expect(ConnectSequence).to.have.property('run')
+  })
+
+  it('should have a prototype', function () {
+    expect(ConnectSequence).to.have.property('prototype')
   })
 })
