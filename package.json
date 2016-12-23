@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "gulp test",
+    "TDD": "gulp test && gulp watch",
     "coverage": "gulp coverage"
   },
   "repository": {
