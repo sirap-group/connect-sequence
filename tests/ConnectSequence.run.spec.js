@@ -13,6 +13,35 @@ describe('ConnectSequence.run()', function () {
     expect(ConnectSequence.run).to.be.a('function')
   })
 
+  it('should throw an Error if one argument is missing', function () {
+    var initMid = function (req, res) {}
+    var noopMid = function (req, res, next) { next() }
+    var run0 = function () {
+      ConnectSequence.run()
+    }
+    var run1 = function () {
+      ConnectSequence.run({})
+    }
+    var run2 = function () {
+      ConnectSequence.run({}, {})
+    }
+    var run3 = function () {
+      ConnectSequence.run({}, {}, function (next) { next() })
+    }
+    var run4 = function () {
+      ConnectSequence.run({}, {}, noopMid)
+    }
+    var run5 = function () {
+      ConnectSequence.run({}, {}, initMid, [noopMid, noopMid, noopMid])
+    }
+    expect(run0).to.throw(Error)
+    expect(run1).to.throw(Error)
+    expect(run2).to.throw(Error)
+    expect(run3).to.throw(Error)
+    expect(run4).to.throw(Error)
+    expect(run5).to.not.throw(Error)
+  })
+
   it('should run the initial next middleware at last', function () {
     var _req = {}
     var _res = {}
