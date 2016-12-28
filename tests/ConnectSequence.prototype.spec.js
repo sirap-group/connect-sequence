@@ -8,6 +8,8 @@ var describe = global.describe
 var it = global.it
 var expect = chai.expect
 
+process.env.NODE_ENV = 'test'
+
 describe('ConnectSequence', function () {
   it('should be a function', function () {
     expect(ConnectSequence).to.be.a('function')
