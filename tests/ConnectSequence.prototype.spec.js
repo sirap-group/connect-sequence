@@ -40,7 +40,7 @@ describe('ConnectSequence.prototype', function () {
   })
 })
 
-describe('new ConnectSequence()', function () {
+describe('var sequence = new ConnectSequence()', function () {
   it('should be an object of type "ConnectSequence"', function () {
     var seq = new ConnectSequence()
     expect(seq).to.be.a('object')
@@ -55,7 +55,7 @@ describe('new ConnectSequence()', function () {
   })
 })
 
-describe('new ConnectSequence().append(mid_1, mid_2, ..., mid_n)', function () {
+describe('sequence.append(mid_1, mid_2, ..., mid_n)', function () {
   it('should augments the length of the middlewares array by the number of given middlewares', function () {
     var seq = new ConnectSequence()
     var mid = function (req, res, next) { next() }
@@ -110,7 +110,7 @@ describe('new ConnectSequence().append(mid_1, mid_2, ..., mid_n)', function () {
   })
 })
 
-describe('new ConnectSequence().appendList([mid_1, mid_2, ..., mid_n])', function () {
+describe('sequence.appendList([mid_1, mid_2, ..., mid_n])', function () {
   it('should throw TypeError if the first argument is not an array', function () {
     var funcs = [
       function () {
