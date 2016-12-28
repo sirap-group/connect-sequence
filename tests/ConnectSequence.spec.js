@@ -6,6 +6,7 @@ var ConnectSequence = require(path.resolve('./lib/ConnectSequence'))
 var MissingArgumentError = require(path.resolve('./lib/errors/MissingArgumentError'))
 
 var describe = global.describe
+var before = global.before
 var it = global.it
 var expect = chai.expect
 
@@ -344,6 +345,7 @@ describe('ConnectSequence', function () {
       var seq = new ConnectSequence()
       expect(seq.run).to.be.a('function')
     })
+
     it('should throw MissingArgumentError if called with lower than 3 arguments', function () {
       var seq = new ConnectSequence()
       var req = {}
@@ -358,6 +360,7 @@ describe('ConnectSequence', function () {
       }
       expect(func).to.throw(MissingArgumentError)
     })
+
     it('should throw TypeError if the given arguments have a bad type', function () {
       var seq = new ConnectSequence()
       var next = function (req, res) { return true }
@@ -374,6 +377,25 @@ describe('ConnectSequence', function () {
       for (var i = 0; i < funcs.length; i++) {
         expect(funcs[i]).to.throw(TypeError)
       }
+    })
+
+    it.skip('should run the initial next middleware at last', function () {
+      var req = {}
+      var res = {}
+      var _next
+      var seq = new ConnectSequence()
+      var first = function (req, res, next) {
+        req.output = 'first'
+      }
+      seq.appendList([first, first, first, first])
+      before(function (done) {
+        seq.run(req, res, _next)
+        _next = function (req, res) {
+          req.output = 'initialNext'
+          done()
+        }
+      })
+      expect(req.output).to.equal('initialNext')
     })
   })
 })
