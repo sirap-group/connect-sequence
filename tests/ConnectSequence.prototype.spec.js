@@ -3,6 +3,7 @@
 var path = require('path')
 var chai = require('chai')
 var ConnectSequence = require(path.resolve('./lib/ConnectSequence'))
+var MissingArgumentError = require(path.resolve('./lib/errors/MissingArgumentError'))
 
 var describe = global.describe
 var it = global.it
@@ -36,6 +37,11 @@ describe('ConnectSequence.prototype', function () {
 
   it('should have a "appendList" method', function () {
     expect(ConnectSequence.prototype).to.have.property('appendList')
+    expect(ConnectSequence.prototype.appendList).to.be.a('function')
+  })
+
+  it('should have a "run" method', function () {
+    expect(ConnectSequence.prototype).to.have.property('run')
     expect(ConnectSequence.prototype.appendList).to.be.a('function')
   })
 })
@@ -182,5 +188,43 @@ describe('sequence.appendList([mid_1, mid_2, ..., mid_n])', function () {
     expect(seq.middlewares.length).to.be.equal(0)
     expect(shouldAppend).to.not.throw(Error)
     expect(seq.middlewares.length).to.be.equal(2)
+  })
+})
+
+describe('sequence.run(req, res, next)', function () {
+  it('should be a function', function () {
+    var seq = new ConnectSequence()
+    expect(seq.run).to.be.a('function')
+  })
+  it('should throw MissingArgumentError if called with lower than 3 arguments', function () {
+    var seq = new ConnectSequence()
+    var req = {}
+    var res = {}
+    var func = function () {
+      var mid0 = function (req, res, next) { next() }
+      var mid1 = function (req, res, next) { next() }
+      var mid2 = function (req, res, next) { next() }
+      var mid3 = function (req, res, next) { next() }
+      seq.appendList([mid0, mid1, mid2, mid3])
+      seq.run(req, res)
+    }
+    expect(func).to.throw(MissingArgumentError)
+  })
+  it('should throw TypeError if the given arguments have a bad type', function () {
+    var seq = new ConnectSequence()
+    var next = function (req, res) { return true }
+    var mid0 = function (req, res, next) { next() }
+    var mid1 = function (req, res, next) { next() }
+    var mid2 = function (req, res, next) { next() }
+    var mid3 = function (req, res, next) { next() }
+    seq.appendList([mid0, mid1, mid2, mid3])
+
+    var func0 = function () { seq.run({}, {}, 'not a function') }
+    var func1 = function () { seq.run({}, 'not an object', next) }
+    var func2 = function () { seq.run('not an object', {}, next) }
+    var funcs = [func0, func1, func2]
+    for (var i = 0; i < funcs.length; i++) {
+      expect(funcs[i]).to.throw(TypeError)
+    }
   })
 })
