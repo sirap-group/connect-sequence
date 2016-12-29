@@ -131,6 +131,19 @@ Finally, we use the [Semver 2.0](http://semver.org/) (Semantic Versioning) to st
 
 > Your contributions posting issues and pull requests are welcome!
 
+### Development
+
+Ensure you are not in `production` environement to install the `devDependencies`
+
+    $ NODE_ENV=development npm install
+
+Then you can start coding in a Test Driven Development environement with `gulp`, `mocha` and `chai`
+
+    $ npm run TDD
+
+The script will lint the lib and test files (but not break on error), run all the unit tests and then it will restart the tests on file change.
+
+
 ## Credits
 
 - Rémi Becheras (https://github.com/rbecheras)
