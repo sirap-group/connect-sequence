@@ -25,7 +25,7 @@ describe('ConnectSequence', function () {
     expect(ConnectSequence).to.have.property('prototype')
   })
 
-  describe('.run()', function () {
+  describe('.run() [deprecated]', function () {
     it('should be a function', function () {
       expect(ConnectSequence.run).to.be.a('function')
     })
