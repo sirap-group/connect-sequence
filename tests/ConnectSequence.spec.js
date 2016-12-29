@@ -10,15 +10,15 @@ var beforeEach = global.beforeEach
 var it = global.it
 var expect = chai.expect
 
-process.env.NODE_ENV = 'test'
-
 describe('ConnectSequence', function () {
-  var seq, req, res, next
+  var seq, req, res, next, mid
 
   beforeEach(function () {
     req = { foo: 'bar' }
     res = {}
     next = function (req, res) { res.foo = req.foo }
+    mid = function (req, res, next) { req.foo = 'baz'; next() }
+    seq = new ConnectSequence(req, res, next)
   })
 
   it('should be a function', function () {
@@ -195,6 +195,11 @@ describe('ConnectSequence', function () {
     it('should have a "appendList" method', function () {
       expect(ConnectSequence.prototype).to.have.property('appendList')
       expect(ConnectSequence.prototype.appendList).to.be.a('function')
+    })
+
+    it('should have a "appendIf" method', function () {
+      expect(ConnectSequence.prototype).to.have.property('appendIf')
+      expect(ConnectSequence.prototype.appendIf).to.be.a('function')
     })
 
     it('should have a "run" method', function () {
@@ -388,6 +393,83 @@ describe('ConnectSequence', function () {
       expect(seq.middlewares.length).to.be.equal(0)
       expect(shouldAppend).to.not.throw(Error)
       expect(seq.middlewares.length).to.be.equal(2)
+    })
+  })
+
+  describe('#appendIf()', function () {
+    var filter
+
+    beforeEach(function () {
+      filter = function (req) { return !!req.foo }
+    })
+
+    it('should throw `MissingArgumentError` if called with lower than 2 arguments', function () {
+      expect(function () {
+        seq.appendIf()
+      }).to.throw(MissingArgumentError)
+
+      expect(function () {
+        seq.appendIf(filter)
+      }).to.throw(MissingArgumentError)
+
+      expect(function () {
+        seq.appendIf(filter, mid)
+      }).to.not.throw(MissingArgumentError)
+    })
+
+    it('should throw `TypeError` if the first arguments is not a function', function () {
+      expect(function () {
+        seq.appendIf('not a function', mid)
+      }).to.throw(TypeError)
+
+      expect(function () {
+        seq.appendIf(filter, mid)
+      }).to.not.throw(Error)
+    })
+
+    it('should throw `TypeError` if second first arguments is not a function', function () {
+      expect(function () {
+        seq.appendIf(filter, 'not a function')
+      }).to.throw(TypeError)
+
+      expect(function () {
+        seq.appendIf(filter, mid)
+      }).to.not.throw(Error)
+    })
+
+    describe('when the previous condition on `req` is `true`', function () {
+      it('should run the given middleware', function (done) {
+        next = function (req, res) {
+          expect(res.foo).to.equal('bar')
+          done()
+        }
+        seq = new ConnectSequence(req, res, next)
+        seq.appendIf(function (req) {
+          return req.foo === 'bar'
+        }, function (req, res, next) {
+          res.foo = req.foo // 'bar'
+          next()
+        })
+        seq.run()
+      })
+    })
+
+    describe('when the previous condition on `req` is `false`', function () {
+      it('should not run the given middleware', function (done) {
+        next = function (req, res) {
+          expect(res.foo).to.not.equal('bar')
+          expect(res.foo).to.be.undefined
+          done()
+        }
+        seq = new ConnectSequence(req, res, next)
+        seq.appendIf(function (req) {
+          return !req.foo
+        }, function (req, res, next) {
+          res.foo = req.foo // 'bar'
+          next()
+        })
+        seq.run()
+      })
     })
   })
 
