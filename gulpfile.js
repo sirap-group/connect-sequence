@@ -20,12 +20,12 @@ gulp.task('lint', function () {
   return gulp.src(['./gulpfile.js', './lib/**/*.js', './tests/**/*.spec.js'])
   .pipe(linter())
   .pipe(linter.reporter('default', {
-    breakOnError: true
+    breakOnError: false
   }))
 })
 
 gulp.task('test', ['lint'], function () {
-  return gulp.src('./tests/connect-sequence.spec.js')
+  return gulp.src('./tests/**/*.spec.js')
   .pipe(mocha())
 })
 
