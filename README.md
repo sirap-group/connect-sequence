@@ -45,18 +45,13 @@ With node package manager (recommanded but not required)
 
 ## Usage
 
-> **Important Note:**
+> The following example is stupid simple.
 >
-> The following example is simple, stupid simple, too simple. **I know it.**
+> In the usage example the conditions tested before pushing the products middlewares in the middlewares array coud/should simply be tested in each middleware that need to test a conditions on the `req` object before doing its stuff.
 >
-> In the usage exampe the conditions tested before pushing the products middlewares in the middlewares array coud/should simply be tested in each middleware that need to test a conditions on the `req` object before doing its stuff.
+> You know the real cases when you need to use the "connect-sequence patern". In this example I just show how to use it.
 >
-> But the key point is to show HOW it could be used, so simplicity is ok.
-> You know the real cases when you need to use the "connect-sequence patern", as I know when I needed it before deciding to write this module.
->
->The truth is **in general, we need this patern when the conditions are complexes and for some good reasons, in these complexes case, the conditions to use or not this or that one middleware shouldn't be tested into it; often because it would be too complex or even impossible.**
->
-> In my cases, I often use this patern when I written some usefull tiny middlewares highly reusable in differents contexts, and these contexts shoud be tested out of these middlewares to keep it clean and real reusable. In particular when I want to reuse a middleware for different API versions of the same resource.
+> I often use this patern when I write some usefull tiny middlewares highly reusable in differents contexts, and these contexts shoud be tested out of these middlewares to keep it clean and really reusable.
 
 ```js
 /**
@@ -70,7 +65,8 @@ var productsController = require('./products.controller')
 module.exports = productRouter
 
 function productRouter (app) {
-  app.route('/api/products/:productId').get(function (req, res, next) {
+  app.route('/api/products/:productId')
+  .get(function (req, res, next) {
     // Create a ConnectSequence instance and setup it with the current `req`,
     // `res` objects and the `next` callback
     var seq = new ConnectSequence(req, res, next)
@@ -83,6 +79,7 @@ function productRouter (app) {
     if (req.query.filter) {
       seq.append(productsController.filter)
     }
+
     if (req.query.format) {
       seq.append(
         productsController.validateFormat,
