@@ -78,37 +78,54 @@ Move in the `node_modules` directory:
  * @module
  */
 
-var connectSequence = require('connect-sequence')
+var ConnectSequence = require('connect-sequence')
 var productsController = require('./products.controller')
 
 module.exports = productRouter
 
 function productRouter (app) {
   app.route('/api/products/:productId').get(function (req, res, next) {
-    var middlewares = []
+    // Create a ConnectSequence instance and setup it with the current `req`,
+    // `res` objects and the `next` callback
+    var seq = new ConnectSequence(req, res, next)
 
-    // build the middlewares sequence
+    // build the desired middlewares sequence thanks to:
+    // - ConnectSequence#append(mid0, ..., mid1),
+    // - ConnectSequence#appendList([mid0, ..., mid1])
+    // - and ConnectSequence#appendIf(condition, mid)
+
     if (req.query.filter) {
-      middlewares.push(productsController.filter)
+      seq.append(productsController.filter)
     }
     if (req.query.format) {
-      middlewares.push(productsController.validateFormat)
-      middlewares.push(productsController.beforeFormat)
-      middlewares.push(productsController.format)
-      middlewares.push(productsController.afterFormat)
+      seq.append(
+        productsController.validateFormat,
+        productsController.beforeFormat,
+        productsController.format,
+        productsController.afterFormat
+      )
     }
-    if (req.query.filter && req.query.format) {
-      middlewares.push(productsController.prepareResponse)
-    }
-    middlewares.push(productsController.sendResponse)
 
-    // run each middleware in sequence
-    connectSequence.run(req, res, next, middlewares)
+    // append the productsController.prepareResponse middleware to the sequence
+    // only if the condition `req.query.format && req.formatedProduct` is true
+    // at the moment where the middleware would be called.
+    // So the condition is tested after the previous middleware is called and thus
+    // if the previous modifies the `req` object, we can test it.
+    seq.appendIf(isProductFormatted, productsController.prepareResponse)
+
+    seq.append(productsController.sendResponse)
+
+    // run the sequence
+    seq.run()
   })
 
   app.param('productId', function (req, res, next, id) {
     // ... yield the product by ID and bind it to the req object
   })
+
+  function isProductFormatted (req) {
+    return Boolean(req.formatedProduct)
+  }
 }
 ```
 
