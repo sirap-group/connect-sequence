@@ -39,23 +39,9 @@ You'll find connect-sequence on these platforms:
 
 ## Installation
 
-### With node package manager (recommanded)
+With node package manager (recommanded but not required)
 
     npm install --save connect-sequence
-
-### Or manually
-
-Download:
-
-    wget https://github.com/sirap-group/connect-sequence/archive/v1.0.0.zip
-
-Extract:
-
-    unzip v1.0.0.zip
-
-Move in the `node_modules` directory:
-
-    mv connect-sequence ./node_modules/connect-sequence
 
 ## Usage
 
