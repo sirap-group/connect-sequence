@@ -13,6 +13,14 @@ var expect = chai.expect
 process.env.NODE_ENV = 'test'
 
 describe('ConnectSequence', function () {
+  var seq, req, res, next
+
+  beforeEach(function () {
+    req = { foo: 'bar' }
+    res = {}
+    next = function (req, res) { res.foo = req.foo }
+  })
+
   it('should be a function', function () {
     expect(ConnectSequence).to.be.a('function')
   })
@@ -194,25 +202,68 @@ describe('ConnectSequence', function () {
       expect(ConnectSequence.prototype.appendList).to.be.a('function')
     })
 
-    describe('.constructor', function () {
-      it('should be an object of type "ConnectSequence"', function () {
-        var seq = new ConnectSequence()
+    describe('.constructor()', function () {
+      it('should be an object of type `ConnectSequence`', function () {
+        seq = new ConnectSequence(req, res, next)
         expect(seq).to.be.a('object')
         expect(seq).to.be.an.instanceof(ConnectSequence)
       })
 
-      it('should init the "middleware" instance property as an empty Array', function () {
-        var seq = new ConnectSequence()
+      it('should init the `middlewares` instance property as an empty Array', function () {
+        seq = new ConnectSequence(req, res, next)
         expect(seq).to.has.a.property('middlewares')
         expect(seq.middlewares).to.be.a('array')
         expect(seq.middlewares.length).to.be.equal(0)
+      })
+
+      it('should throw `MissingArgumentError` if called with lower than 3 arguments', function () {
+        expect(function () {
+          seq = new ConnectSequence({})
+        }).to.throw(MissingArgumentError)
+
+        expect(function () {
+          seq = new ConnectSequence({}, {})
+        }).to.throw(MissingArgumentError)
+      })
+
+      it('should throw `TypeError` if the first argument is not an object', function () {
+        expect(function () {
+          seq = new ConnectSequence('not an object', {}, function (req, res) { return true })
+        }).to.throw(TypeError)
+      })
+
+      it('should throw `TypeError` if the second argument is not an object', function () {
+        expect(function () {
+          seq = new ConnectSequence({}, 'not an object', function (req, res) { return true })
+        }).to.throw(TypeError)
+      })
+
+      it('should throw `TypeError` if the third argument is not a function', function () {
+        expect(function () {
+          seq = new ConnectSequence({}, {}, 'not a function')
+        }).to.throw(TypeError)
+      })
+
+      it('should init the `req` object', function () {
+        seq = new ConnectSequence(req, res, next)
+        expect(seq.req).to.equal(req)
+      })
+
+      it('should init the `res` object', function () {
+        seq = new ConnectSequence(req, res, next)
+        expect(seq.res).to.equal(res)
+      })
+
+      it('should init the `next` function', function () {
+        seq = new ConnectSequence(req, res, next)
+        expect(seq.next).to.equal(next)
       })
     })
   })
 
   describe('#append()', function () {
     it('should augments the length of the middlewares array by the number of given middlewares', function () {
-      var seq = new ConnectSequence()
+      seq = new ConnectSequence(req, res, next)
       var mid = function (req, res, next) { next() }
       seq.append(mid)
       expect(seq.middlewares.length).to.equal(1)
@@ -227,7 +278,7 @@ describe('ConnectSequence', function () {
     })
 
     it('should keep the same order of the given middlewares', function () {
-      var seq = new ConnectSequence()
+      seq = new ConnectSequence(req, res, next)
       var mid0 = function (req, res, next) { next() }
       var mid1 = function (req, res, next) { next() }
       var mid2 = function (req, res, next) { next() }
@@ -248,7 +299,7 @@ describe('ConnectSequence', function () {
     })
 
     it('should throw a TypeError and reject all middlewares if one is not a function', function () {
-      var seq = new ConnectSequence()
+      seq = new ConnectSequence(req, res, next)
       var mid1 = function (req, res, next) { next() }
       var mid2 = 'not a function'
       var mid3 = function (req, res, next) { next() }
@@ -269,15 +320,15 @@ describe('ConnectSequence', function () {
     it('should throw TypeError if the first argument is not an array', function () {
       var funcs = [
         function () {
-          var seq = new ConnectSequence()
+          seq = new ConnectSequence(req, res, next)
           seq.appendList('not an array')
         },
         function () {
-          var seq = new ConnectSequence()
+          seq = new ConnectSequence(req, res, next)
           seq.appendList({foo: 'not an array'})
         },
         function () {
-          var seq = new ConnectSequence()
+          seq = new ConnectSequence(req, res, next)
           seq.appendList(function () { return 'not an array' })
         }
       ]
@@ -287,7 +338,7 @@ describe('ConnectSequence', function () {
     })
 
     it('should augments the length of the middlewares array by the number of given middlewares', function () {
-      var seq = new ConnectSequence()
+      seq = new ConnectSequence(req, res, next)
       var mid = function (req, res, next) { next() }
       seq.appendList([mid])
       expect(seq.middlewares.length).to.equal(1)
@@ -302,7 +353,7 @@ describe('ConnectSequence', function () {
     })
 
     it('should keep the same order of the given middlewares', function () {
-      var seq = new ConnectSequence()
+      seq = new ConnectSequence(req, res, next)
       var mid0 = function (req, res, next) { next() }
       var mid1 = function (req, res, next) { next() }
       var mid2 = function (req, res, next) { next() }
@@ -323,7 +374,7 @@ describe('ConnectSequence', function () {
     })
 
     it('should throw a TypeError and reject all middlewares if one is not a function', function () {
-      var seq = new ConnectSequence()
+      seq = new ConnectSequence(req, res, next)
       var mid1 = function (req, res, next) { next() }
       var mid2 = 'not a function'
       var mid3 = function (req, res, next) { next() }
@@ -341,14 +392,10 @@ describe('ConnectSequence', function () {
   })
 
   describe('#run()', function () {
-    var seq, req, res, next
     var mid0, mid1, mid2, mid3
-    var func0, func1, func2
 
     beforeEach(function () {
-      seq = new ConnectSequence()
-      req = {}
-      res = {}
+      seq = new ConnectSequence(req, res, next)
       mid0 = function mid0 (req, res, next) {
         ensureReqIdsDefined(req)
         req.ids.push('mid0')
@@ -375,35 +422,14 @@ describe('ConnectSequence', function () {
       expect(seq.run).to.be.a('function')
     })
 
-    it('should throw MissingArgumentError if called with lower than 3 arguments', function () {
-      func0 = function () {
-        seq.appendList([mid0, mid1, mid2, mid3])
-        seq.run(req, res)
-      }
-      expect(func0).to.throw(MissingArgumentError)
-    })
-
-    it('should throw TypeError if the given arguments have a bad type', function () {
-      next = function (req, res) { return true }
-      seq.append(mid0, mid1, mid2, mid3)
-
-      func0 = function () { seq.run('not an object', {}, next) }
-      func1 = function () { seq.run({}, 'not an object', next) }
-      func2 = function () { seq.run({}, {}, 'not a function') }
-
-      var funcs = [func0, func1, func2]
-      for (var i = 0; i < funcs.length; i++) {
-        expect(funcs[i]).to.throw(TypeError)
-      }
-    })
-
     it('should run the initial next middleware at last', function (done) {
       next = function (req, res) {
         req.ids = 'initialNext'
         done()
       }
+      seq = new ConnectSequence(req, res, next)
       seq.append(mid0, mid0, mid0, mid0)
-      seq.run(req, res, next)
+      seq.run()
       expect(req.ids).to.be.a(String)
       expect(req.ids).to.equal('initialNext')
     })
@@ -418,8 +444,9 @@ describe('ConnectSequence', function () {
         expect(req.ids).to.contain('mid3')
         setTimeout(done, 20)
       }
+      seq = new ConnectSequence(req, res, next)
       seq.append(mid0, mid1, mid2, mid3)
-      seq.run(req, res, next)
+      seq.run()
     })
 
     it('should run all the middlewares in the same order than the given array', function (done) {
@@ -428,8 +455,9 @@ describe('ConnectSequence', function () {
         expect(req.ids.join()).to.equal('mid0,mid1,mid2,mid3,initial')
         setTimeout(done, 20)
       }
+      seq = new ConnectSequence(req, res, next)
       seq.append(mid0, mid1, mid2, mid3)
-      seq.run(req, res, next)
+      seq.run()
     })
 
     it('should run each middleware as a callback of the previous', function (done) {
@@ -453,6 +481,7 @@ describe('ConnectSequence', function () {
       var _mid3 = function (req, res, next) {
         setTimeout(mid3.bind(null, req, res, next), 150)
       }
+      seq = new ConnectSequence(req, res, next)
       seq.append(_mid0, _mid1, _mid2, _mid3)
       seq.run(req, res, next)
     })
