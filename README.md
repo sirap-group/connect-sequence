@@ -1,18 +1,19 @@
-# connect-sequence [![GitHub tag](https://img.shields.io/github/tag/sirap-group/connect-sequence.svg?maxAge=2592000?style=plastic)](git@github.com:sirap-group/connect-sequence.git) [![npm](https://img.shields.io/npm/v/connect-sequence.svg?maxAge=2592000?style=plastic)](https://www.npmjs.com/package/connect-sequence)
+# connect-sequence [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/sirap-group/connect-sequence/master/LICENSE) [![GitHub tag](https://img.shields.io/github/tag/sirap-group/connect-sequence.svg?maxAge=2592000?style=plastic)](git@github.com:sirap-group/connect-sequence.git)
 
 [![NPM](https://nodei.co/npm/connect-sequence.png?compact=true)](https://nodei.co/npm/connect-sequence/)
+
+![node: LTS/argon](https://img.shields.io/badge/node-LTS%20%2F%20Argon-brightgreen.svg)
+![node: LTS/argon](https://img.shields.io/badge/node-LTS%20%2F%20Boron-brightgreen.svg)
+[![npm](https://img.shields.io/npm/v/connect-sequence.svg?maxAge=2592000?style=plastic)](https://www.npmjs.com/package/connect-sequence)
 
 [![Build Status](https://travis-ci.org/sirap-group/connect-sequence.png)](https://travis-ci.org/sirap-group/connect-sequence)
 [![Coverage Status](https://coveralls.io/repos/github/sirap-group/connect-sequence/badge.svg?branch=master)](https://coveralls.io/github/sirap-group/connect-sequence?branch=master)
 ![NPM](https://david-dm.org/sirap-group/connect-sequence.svg)
 
 
-
 [![JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
 [![Semver 2.0](https://img.shields.io/badge/Versioning-Semver%202.0-brightgreen.svg)](http://semver.org/)
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg?maxAge=2592000?style=plastic)](https://github.com/sirap-group/connect-sequence)
-
-
 
 A node.js module to run connect-like middlewares in sequence
 
@@ -39,38 +40,19 @@ You'll find connect-sequence on these platforms:
 
 ## Installation
 
-### With node package manager (recommanded)
+With node package manager (recommanded but not required)
 
     npm install --save connect-sequence
 
-### Or manually
-
-Download:
-
-    wget https://github.com/sirap-group/connect-sequence/archive/v1.0.0.zip
-
-Extract:
-
-    unzip v1.0.0.zip
-
-Move in the `node_modules` directory:
-
-    mv connect-sequence ./node_modules/connect-sequence
-
 ## Usage
 
-> **Important Note:**
+> The following example is stupid simple.
 >
-> The following example is simple, stupid simple, too simple. **I know it.**
+> In the usage example the conditions tested before pushing the products middlewares in the middlewares array coud/should simply be tested in each middleware that need to test a conditions on the `req` object before doing its stuff.
 >
-> In the usage exampe the conditions tested before pushing the products middlewares in the middlewares array coud/should simply be tested in each middleware that need to test a conditions on the `req` object before doing its stuff.
+> You know the real cases when you need to use the "connect-sequence patern". In this example I just show how to use it.
 >
-> But the key point is to show HOW it could be used, so simplicity is ok.
-> You know the real cases when you need to use the "connect-sequence patern", as I know when I needed it before deciding to write this module.
->
->The truth is **in general, we need this patern when the conditions are complexes and for some good reasons, in these complexes case, the conditions to use or not this or that one middleware shouldn't be tested into it; often because it would be too complex or even impossible.**
->
-> In my cases, I often use this patern when I written some usefull tiny middlewares highly reusable in differents contexts, and these contexts shoud be tested out of these middlewares to keep it clean and real reusable. In particular when I want to reuse a middleware for different API versions of the same resource.
+> I often use this patern when I write some usefull tiny middlewares highly reusable in differents contexts, and these contexts shoud be tested out of these middlewares to keep it clean and really reusable.
 
 ```js
 /**
@@ -78,37 +60,56 @@ Move in the `node_modules` directory:
  * @module
  */
 
-var connectSequence = require('connect-sequence')
+var ConnectSequence = require('connect-sequence')
 var productsController = require('./products.controller')
 
 module.exports = productRouter
 
 function productRouter (app) {
-  app.route('/api/products/:productId').get(function (req, res, next) {
-    var middlewares = []
+  app.route('/api/products/:productId')
+  .get(function (req, res, next) {
+    // Create a ConnectSequence instance and setup it with the current `req`,
+    // `res` objects and the `next` callback
+    var seq = new ConnectSequence(req, res, next)
 
-    // build the middlewares sequence
+    // build the desired middlewares sequence thanks to:
+    // - ConnectSequence#append(mid0, ..., mid1),
+    // - ConnectSequence#appendList([mid0, ..., mid1])
+    // - and ConnectSequence#appendIf(condition, mid)
+
     if (req.query.filter) {
-      middlewares.push(productsController.filter)
+      seq.append(productsController.filter)
     }
-    if (req.query.format) {
-      middlewares.push(productsController.validateFormat)
-      middlewares.push(productsController.beforeFormat)
-      middlewares.push(productsController.format)
-      middlewares.push(productsController.afterFormat)
-    }
-    if (req.query.filter && req.query.format) {
-      middlewares.push(productsController.prepareResponse)
-    }
-    middlewares.push(productsController.sendResponse)
 
-    // run each middleware in sequence
-    connectSequence.run(req, res, next, middlewares)
+    if (req.query.format) {
+      seq.append(
+        productsController.validateFormat,
+        productsController.beforeFormat,
+        productsController.format,
+        productsController.afterFormat
+      )
+    }
+
+    // append the productsController.prepareResponse middleware to the sequence
+    // only if the condition `req.query.format && req.formatedProduct` is true
+    // at the moment where the middleware would be called.
+    // So the condition is tested after the previous middleware is called and thus
+    // if the previous modifies the `req` object, we can test it.
+    seq.appendIf(isProductFormatted, productsController.prepareResponse)
+
+    seq.append(productsController.sendResponse)
+
+    // run the sequence
+    seq.run()
   })
 
   app.param('productId', function (req, res, next, id) {
     // ... yield the product by ID and bind it to the req object
   })
+
+  function isProductFormatted (req) {
+    return Boolean(req.formatedProduct)
+  }
 }
 ```
 
@@ -130,6 +131,19 @@ We use [Gulp](http://gulpjs.com/) some gulp plugins and some other node modules 
 Finally, we use the [Semver 2.0](http://semver.org/) (Semantic Versioning) to standardize the release version numbers (major/minor/path/pre-release).
 
 > Your contributions posting issues and pull requests are welcome!
+
+### Development
+
+Ensure you are not in `production` environement to install the `devDependencies`
+
+    $ NODE_ENV=development npm install
+
+Then you can start coding in a Test Driven Development environement with `gulp`, `mocha` and `chai`
+
+    $ npm run TDD
+
+The script will lint the lib and test files (but not break on error), run all the unit tests and then it will restart the tests on file change.
+
 
 ## Credits
 
