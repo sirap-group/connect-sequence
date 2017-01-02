@@ -65,7 +65,7 @@ gulp.task('release', ['bump'], function (done) {
       done()
       return
     }
-    var pkg = require('./package.json')
+    var pkg = require('./package')
     var version = 'v' + pkg.version
     var releaseType = getBumpType()
     var commitMsg = 'Releasing ' + releaseType + ' version: ' + version
