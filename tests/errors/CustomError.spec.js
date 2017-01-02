@@ -2,7 +2,6 @@
 
 var path = require('path')
 var chai = require('chai')
-var PrivateMethodError = require(path.resolve('./lib/errors/PrivateMethodError'))
 
 var CustomError = require(path.resolve('./lib/errors/CustomError'))
 

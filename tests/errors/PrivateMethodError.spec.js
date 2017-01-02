@@ -16,7 +16,7 @@ describe('PrivateMethodError', function () {
   })
 
   it("should have a 'DEFAULT_ERROR_MESSAGE' static constant property", function () {
-    expect(PrivateMethodError).to.be.a.property('DEFAULT_ERROR_MESSAGE')
+    expect(PrivateMethodError).to.have.a.property('DEFAULT_ERROR_MESSAGE')
   })
 
   describe('.prototype', function () {
@@ -55,7 +55,7 @@ describe('PrivateMethodError', function () {
       it("should have a 'stack' property of type 'String'", function () {
         var msg = 'i am private'
         var err = new PrivateMethodError(msg)
-        expect(err).to.be.a.property('stack')
+        expect(err).to.have.a.property('stack')
         expect(err.stack).to.be.a('String')
       })
 
