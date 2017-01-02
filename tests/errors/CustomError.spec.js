@@ -62,12 +62,6 @@ describe('CustomError', function () {
         expect(err.createStackTrace).to.be.a('function')
       })
 
-      it("should have a 'privatize' property of type 'function'", function () {
-        var err = new CustomError()
-        expect(err).to.be.a.property('privatize')
-        expect(err.privatize).to.be.a('function')
-      })
-
       describe('when giving a non-string argument', function () {
         it('should not fail', function () {
           var func = function () { return new CustomError(func) }
