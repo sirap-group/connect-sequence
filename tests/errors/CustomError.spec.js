@@ -2,6 +2,9 @@
 
 var path = require('path')
 var chai = require('chai')
+var PrivateMethodError = require(path.resolve('./lib/errors/PrivateMethodError'))
+var ProtectedMethodError = require(path.resolve('./lib/errors/ProtectedMethodError'))
+
 var CustomError = require(path.resolve('./lib/errors/CustomError'))
 
 var describe = global.describe
@@ -13,7 +16,7 @@ describe('CustomError', function () {
     expect(CustomError).to.be.a('function')
   })
 
-  it("should not have a 'DEFAULT_ERROR_MESSAGE' static constant property (child classes should have one)", function () {
+  it("should not have a 'DEFAULT_ERROR_MESSAGE' static constant property (child classes should)", function () {
     expect(CustomError).to.not.have.a.property('DEFAULT_ERROR_MESSAGE')
   })
 
@@ -73,40 +76,78 @@ describe('CustomError', function () {
         expect(err.protect).to.be.a('function')
       })
 
-      it('should not fail if an bad type is given instead of a string as first argument', function () {
-        var err
-        var func = function () { err = new CustomError(func) }
-        var obj = function () { err = new CustomError({ foo: 'bar' }) }
-        var arr = function () { err = new CustomError([ 'foo', 'baz' ]) }
+      describe('when giving a non-string argument', function () {
+        it('should not fail', function () {
+          var func = function () { return new CustomError(func) }
+          var obj = function () { return new CustomError({ foo: 'bar' }) }
+          var arr = function () { return new CustomError([ 'foo', 'baz' ]) }
 
-        expect(func).to.not.throw('TypeError')
-        expect(obj).to.not.throw('TypeError')
-        expect(arr).to.not.throw('TypeError')
+          expect(func).to.not.throw()
+          expect(obj).to.not.throw()
+          expect(arr).to.not.throw()
+        })
       })
 
-      it('should fails if we call the private createStackTrace method', function () {
-        var func = function () {
-          var err = new CustomError(func)
-          var t = err.createStackTrace()
-          console.log(t)
-        }
-        expect(func).to.throw(Error)
+      describe('when called without argument', function () {
+        it('should not have a default error message (child classes should)', function () {
+          var err = new CustomError()
+          expect(err.message).to.not.be.a('String')
+          expect(err.message).to.be.undefined
+        })
       })
 
-      it('should fails if a child class call the protected createStackTrace method', function () {
-        var func = function () {
-          var err = new CustomError(func)
-          var t = err.createStackTrace()
-          console.log(t)
-        }
-        expect(func).to.throw(Error)
-      })
-
-      it('should not have a default error message if no argument is given (child class should have)', function () {
-        var err = new CustomError()
-        expect(err.message).to.not.be.a('String')
-        expect(err.message).to.be.undefined
+      describe('when called without argument from a child class', function () {
+        it('should set the child class DEFAULT_ERROR_MESSAGE', function () {
+          var err
+          var ChildError = function ChildError (msg) {
+            CustomError.call(this, msg)
+          }
+          ChildError.prototype = Object.create(CustomError.prototype)
+          ChildError.prototype.constructor = ChildError
+          ChildError.DEFAULT_ERROR_MESSAGE = 'child error'
+          err = new ChildError()
+          expect(err).to.be.an('object')
+          expect(err).to.be.an.instanceof(ChildError)
+          expect(err.message).to.be.a('string')
+          expect(err.message).to.equal(ChildError.DEFAULT_ERROR_MESSAGE)
+        })
       })
     })
+
+    describe('#setMessage()', function () {
+      describe('when called from outside', function () {
+        it('should thow PrivateMethodError', function () {
+          var err = new CustomError(func)
+          var func = function () {
+            return err.setMessage()
+          }
+          expect(func).to.throw(PrivateMethodError)
+        })
+      })
+    })
+
+    describe('#createStackTrace()', function () {
+      describe('when called from outside', function () {
+        it('should thow PrivateMethodError', function () {
+          var err = new CustomError(func)
+          var func = function () {
+            return err.createStackTrace()
+          }
+          expect(func).to.throw(PrivateMethodError)
+        })
+      })
+
+      describe.skip('when called from a child class', function () {
+        it('should throw ProtectedMethodError', function () {
+          var func = function () {
+            var err = new CustomError(func)
+            var t = err.createStackTrace()
+            console.log(t)
+          }
+          expect(func).to.throw(ProtectedMethodError)
+        })
+      })
+    })
+
   })
 })
