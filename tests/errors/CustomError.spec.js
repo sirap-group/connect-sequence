@@ -3,7 +3,6 @@
 var path = require('path')
 var chai = require('chai')
 var PrivateMethodError = require(path.resolve('./lib/errors/PrivateMethodError'))
-var ProtectedMethodError = require(path.resolve('./lib/errors/ProtectedMethodError'))
 
 var CustomError = require(path.resolve('./lib/errors/CustomError'))
 
@@ -70,12 +69,6 @@ describe('CustomError', function () {
         expect(err.privatize).to.be.a('function')
       })
 
-      it("should have a 'protect' property of type 'function'", function () {
-        var err = new CustomError()
-        expect(err).to.be.a.property('protect')
-        expect(err.protect).to.be.a('function')
-      })
-
       describe('when giving a non-string argument', function () {
         it('should not fail', function () {
           var func = function () { return new CustomError(func) }
@@ -113,41 +106,5 @@ describe('CustomError', function () {
         })
       })
     })
-
-    describe('#setMessage()', function () {
-      describe('when called from outside', function () {
-        it('should thow PrivateMethodError', function () {
-          var err = new CustomError(func)
-          var func = function () {
-            return err.setMessage()
-          }
-          expect(func).to.throw(PrivateMethodError)
-        })
-      })
-    })
-
-    describe('#createStackTrace()', function () {
-      describe('when called from outside', function () {
-        it('should thow PrivateMethodError', function () {
-          var err = new CustomError(func)
-          var func = function () {
-            return err.createStackTrace()
-          }
-          expect(func).to.throw(PrivateMethodError)
-        })
-      })
-
-      describe.skip('when called from a child class', function () {
-        it('should throw ProtectedMethodError', function () {
-          var func = function () {
-            var err = new CustomError(func)
-            var t = err.createStackTrace()
-            console.log(t)
-          }
-          expect(func).to.throw(ProtectedMethodError)
-        })
-      })
-    })
-
   })
 })
