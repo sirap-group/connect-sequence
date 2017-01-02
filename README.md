@@ -10,6 +10,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/sirap-group/connect-sequence/badge.svg?branch=master)](https://coveralls.io/github/sirap-group/connect-sequence?branch=master)
 ![NPM](https://david-dm.org/sirap-group/connect-sequence.svg)
 
+[![Code Climate](https://codeclimate.com/github/sirap-group/connect-sequence/badges/gpa.svg)](https://codeclimate.com/github/sirap-group/connect-sequence) [![Issue Count](https://codeclimate.com/github/sirap-group/connect-sequence/badges/issue_count.svg)](https://codeclimate.com/github/sirap-group/connect-sequence)
 
 [![JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
 [![Semver 2.0](https://img.shields.io/badge/Versioning-Semver%202.0-brightgreen.svg)](http://semver.org/)
