@@ -1,6 +1,6 @@
 {
   "name": "connect-sequence",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A node.js module to run connect-like middlewares in sequence",
   "main": "index.js",
   "scripts": {
