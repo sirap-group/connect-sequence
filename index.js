@@ -6,4 +6,4 @@
  */
 
 'use strict'
-require('./lib/ConnectSequence')
+module.exports = require('./lib/ConnectSequence')
