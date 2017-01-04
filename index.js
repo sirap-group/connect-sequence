@@ -6,4 +6,4 @@
  */
 
 'use strict'
-require('./lib/connect-sequence')
+require('./lib/ConnectSequence')
