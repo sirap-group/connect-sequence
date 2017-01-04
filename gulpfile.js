@@ -20,7 +20,7 @@ gulp.task('lint', function () {
   return gulp.src(['./gulpfile.js', './lib/**/*.js', './tests/**/*.spec.js'])
   .pipe(linter())
   .pipe(linter.reporter('default', {
-    breakOnError: false
+    breakOnError: argv.breakOnError
   }))
 })
 
