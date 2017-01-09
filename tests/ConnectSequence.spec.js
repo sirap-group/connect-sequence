@@ -10,6 +10,8 @@ var beforeEach = global.beforeEach
 var it = global.it
 var expect = chai.expect
 
+var EXPECTED_MIDDLEWARE_ERROR_MESSAGE = 'expected middleware error'
+
 describe('ConnectSequence', function () {
   var seq, req, res, next, mid
 
@@ -566,6 +568,89 @@ describe('ConnectSequence', function () {
       seq = new ConnectSequence(req, res, next)
       seq.append(_mid0, _mid1, _mid2, _mid3)
       seq.run(req, res, next)
+    })
+
+    describe('When a middleware throw an error in the next callback', function () {
+      var midErr, nextErr, errorHandler
+      var midBefore0, midBefore1
+      var midAfter0
+      var runSeq
+
+      beforeEach(function () {
+        midBefore0 = mid0
+        midBefore1 = mid1
+        midErr = new Error(EXPECTED_MIDDLEWARE_ERROR_MESSAGE)
+        nextErr = function (req, res, next) { next(midErr) }
+      })
+
+      describe('The error handler middleware f(req, res, next, err)', function () {
+        it('should handle any error passed in the fourth argument', function (done) {
+          next = function (req, res) {
+            done()
+          }
+          errorHandler = function (req, res, next, err) {
+            expect(err).to.equal(EXPECTED_MIDDLEWARE_ERROR_MESSAGE)
+            next()
+            done()
+          }
+          midAfter0 = function (req, res, next) {
+            ensureReqIdsDefined(req)
+            req.ids.push('midAfter0')
+            next()
+          }
+          seq = new ConnectSequence(req, res, next)
+          seq.append(midBefore0, nextErr, midBefore1, errorHandler, midAfter0)
+          seq.run()
+        })
+
+        it('should skip the initial next middleware', function (done) {
+          next = function (req, res) {
+            throw new Error('Forbidden middleware')
+          }
+          errorHandler = function (req, res, next, err) {
+            // the error is handled ...
+            next()
+            done()
+          }
+          midAfter0 = function (req, res, next) {
+            ensureReqIdsDefined(req)
+            req.ids.push('midAfter0')
+            next()
+          }
+          seq = new ConnectSequence(req, res, next)
+          seq.append(midBefore0, nextErr, midBefore1, errorHandler, midAfter0)
+          runSeq = function () { seq.run() }
+          expect(runSeq).to.not.throw(Error)
+        })
+
+        it('should skip all middlewares after the middleware throwing and error', function (done) {
+          next = function (req, res) {
+            if (!req.isDone) {
+              req.isDone = true
+              done()
+            }
+          }
+          errorHandler = function (req, res, next, err) {
+            // the error is handled ...
+            next()
+            if (!req.isDone) {
+              req.isDone = true
+              done()
+            }
+          }
+          midAfter0 = function (req, res, next) {
+            ensureReqIdsDefined(req)
+            req.ids.push('midAfter0')
+            // next()
+            throw new Error('Forbidden middleware')
+          }
+          seq = new ConnectSequence(req, res, next)
+          seq.append(midBefore0, nextErr, midBefore1, errorHandler, midAfter0)
+          expect(function () {
+            seq.run()
+          }).to.not.throw(Error)
+        })
+      })
     })
   })
 })
