@@ -91,17 +91,17 @@ function productRouter (app) {
       )
     }
 
+    // unless #run(), the other methods are chainable:
+
     // append the productsController.prepareResponse middleware to the sequence
     // only if the condition `req.query.format && req.formatedProduct` is true
     // at the moment where the middleware would be called.
     // So the condition is tested after the previous middleware is called and thus
     // if the previous modifies the `req` object, we can test it.
     seq.appendIf(isProductFormatted, productsController.prepareResponse)
-
-    seq.append(productsController.sendResponse)
-
+    .append(productsController.sendResponse)
     // run the sequence
-    seq.run()
+    .run()
   })
 
   app.param('productId', function (req, res, next, id) {
