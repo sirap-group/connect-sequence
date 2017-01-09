@@ -10,6 +10,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/sirap-group/connect-sequence/badge.svg?branch=master)](https://coveralls.io/github/sirap-group/connect-sequence?branch=master)
 ![NPM](https://david-dm.org/sirap-group/connect-sequence.svg)
 
+[![Code Climate](https://codeclimate.com/github/sirap-group/connect-sequence/badges/gpa.svg)](https://codeclimate.com/github/sirap-group/connect-sequence) [![Issue Count](https://codeclimate.com/github/sirap-group/connect-sequence/badges/issue_count.svg)](https://codeclimate.com/github/sirap-group/connect-sequence)
 
 [![JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
 [![Semver 2.0](https://img.shields.io/badge/Versioning-Semver%202.0-brightgreen.svg)](http://semver.org/)
@@ -90,17 +91,17 @@ function productRouter (app) {
       )
     }
 
+    // unless #run(), the other methods are chainable:
+
     // append the productsController.prepareResponse middleware to the sequence
     // only if the condition `req.query.format && req.formatedProduct` is true
     // at the moment where the middleware would be called.
     // So the condition is tested after the previous middleware is called and thus
     // if the previous modifies the `req` object, we can test it.
     seq.appendIf(isProductFormatted, productsController.prepareResponse)
-
-    seq.append(productsController.sendResponse)
-
+    .append(productsController.sendResponse)
     // run the sequence
-    seq.run()
+    .run()
   })
 
   app.param('productId', function (req, res, next, id) {
