@@ -481,20 +481,44 @@ describe('ConnectSequence', function () {
     })
 
     describe('when the previous condition on `req` is `false`', function () {
-      it('should not run the given middleware', function (done) {
-        next = function () {
-          expect(res.foo).to.not.equal('bar')
-          expect(res.foo).to.be.undefined
-          done()
-        }
-        seq = new ConnectSequence(req, res, next)
-        seq.appendIf(function (req) {
-          return !req.foo
-        }, function (req, res, next) {
-          res.foo = req.foo // 'bar'
-          next()
+      describe('when passing a normal middleware', function () {
+        it('should not run the given middleware', function (done) {
+          next = function () {
+            expect(res.foo).to.not.equal('bar')
+            expect(res.foo).to.be.undefined
+            done()
+          }
+          seq = new ConnectSequence(req, res, next)
+          seq.appendIf(function (req) {
+            return !req.foo
+          }, function (req, res, next) {
+            res.foo = req.foo // 'bar'
+            next()
+          })
+          seq.run()
         })
-        seq.run()
+      })
+
+      describe('when passing a error handler middleware', function () {
+        it('should not run the given error handler', function (done) {
+          next = function () {
+            expect(res.foo).to.not.equal('bar')
+            done()
+          }
+          seq = new ConnectSequence(req, res, next)
+          seq.append(function (req, res, next) {
+            next('middleware in error')
+          })
+          seq.appendIf(function (req) {
+            return !req.foo // 'bar'
+          }, function (err, req, res, next) {
+            if (err) {
+              res.foo = req.foo // 'bar'
+            }
+            next()
+          })
+          seq.run()
+        })
       })
     })
   })
