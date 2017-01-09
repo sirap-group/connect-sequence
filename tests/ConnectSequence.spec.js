@@ -269,6 +269,11 @@ describe('ConnectSequence', function () {
   })
 
   describe('#append()', function () {
+    it('should be chainable', function () {
+      seq = new ConnectSequence(req, res, next)
+      expect(seq.append(mid)).to.equal(seq)
+    })
+
     it('should augments the length of the middlewares array by the number of given middlewares', function () {
       seq = new ConnectSequence(req, res, next)
       var mid = function (req, res, next) { next() }
@@ -324,6 +329,11 @@ describe('ConnectSequence', function () {
   })
 
   describe('#appendList()', function () {
+    it('should be chainable', function () {
+      seq = new ConnectSequence(req, res, next)
+      expect(seq.appendList([mid])).to.equal(seq)
+    })
+
     it('should throw TypeError if the first argument is not an array', function () {
       var funcs = [
         function () {
@@ -403,6 +413,11 @@ describe('ConnectSequence', function () {
 
     beforeEach(function () {
       filter = function (req) { return !!req.foo }
+    })
+
+    it('should be chainable', function () {
+      seq = new ConnectSequence(req, res, next)
+      expect(seq.appendIf(filter, mid)).to.equal(seq)
     })
 
     it('should throw `MissingArgumentError` if called with lower than 2 arguments', function () {
