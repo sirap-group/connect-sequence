@@ -415,6 +415,11 @@ describe('ConnectSequence', function () {
       filter = function (req) { return !!req.foo }
     })
 
+    it('should be chainable', function () {
+      seq = new ConnectSequence(req, res, next)
+      expect(seq.appendIf(filter, mid)).to.equal(seq)
+    })
+
     it('should throw `MissingArgumentError` if called with lower than 2 arguments', function () {
       expect(function () {
         seq.appendIf()
