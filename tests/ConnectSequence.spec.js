@@ -397,6 +397,24 @@ describe('ConnectSequence', function () {
       })
 
       describe('when passing a error handler middleware', function () {
+        it('should not run the given error handler', function (done) {
+          next = function () {
+            expect(res.foo).to.not.equal('bar')
+            done()
+          }
+          seq.append(function (req, res, next) {
+            next('middleware in error')
+          })
+          seq.appendIf(function (req) {
+            return !req.foo // 'bar'
+          }, function (err, req, res, next) {
+            if (err) {
+              res.foo = req.foo // 'bar'
+            }
+            next()
+          })
+        })
+
         it('should not run any given error handler or normal middlewares', function (done) {
           var errorHandler = function (err, req, res, next) {
             if (err) { req.errorHandler = 'errorHandler' }
