@@ -424,13 +424,9 @@ describe('ConnectSequence', function () {
         })
 
         it('should not run any given error handler or normal middlewares', function (done) {
-          var errorEmitter = function (req, res, next) {
-            req.errorEmitter = 'errorEmitter'
-            next('errorEmitter')
-          }
           next = function () {
-            expect(req.mid0).to.be.undefined
-            expect(req.errorEmitter).to.be.undefined
+            expect(req.mid0).to.equal('mid0')
+            expect(req.errorEmitter).to.equal('errorEmitter')
             expect(req.mid1).to.be.undefined
             expect(req.mid2).to.be.undefined
             expect(req.errorHandler).to.be.undefined
@@ -438,7 +434,8 @@ describe('ConnectSequence', function () {
             done()
           }
           seq = new ConnectSequence(req, res, next)
-          seq.appendIf(filter, mid0, errorEmitter, mid1, mid2, errorHandler, mid3)
+          seq.append(mid0, errorEmitter)
+          seq.appendIf(filter, mid1, mid2, errorHandler, mid3)
           seq.run()
         })
       })
