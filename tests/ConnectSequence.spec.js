@@ -258,9 +258,18 @@ describe('ConnectSequence', function () {
   describe('#appendIf()', function () {
     var filter
     var mid0, mid1, mid2, mid3, mid4
+    var errorEmitter, errorHandler
 
     beforeEach(function () {
       filter = function (req) { return !!req.foo }
+      errorEmitter = function (req, res, next) {
+        req.errorEmitter = 'errorEmitter'
+        next('errorEmitter')
+      }
+      errorHandler = function (err, req, res, next) {
+        if (err) { req.errorHandler = 'errorHandler' }
+        next()
+      }
       mid0 = function (req, res, next) {
         req.mid0 = 'mid0'
         next()
@@ -331,6 +340,10 @@ describe('ConnectSequence', function () {
     })
 
     describe('when the previous condition on `req` is `true`', function () {
+      beforeEach(function () {
+        filter = function (req) { return true }
+      })
+
       describe('when passing a normal middleware', function () {
         it('should run the given middlewares', function (done) {
           next = function () {
@@ -341,7 +354,6 @@ describe('ConnectSequence', function () {
             expect(req.mid4).to.equal('mid4')
             done()
           }
-          filter = function (req) { return true }
           seq = new ConnectSequence(req, res, next)
           seq.appendIf(filter, mid0, mid1, mid2, mid3, mid4)
           seq.run()
@@ -349,15 +361,18 @@ describe('ConnectSequence', function () {
       })
 
       describe('when passing a error handler middleware', function () {
+        it('should run the given error handler', function (done) {
+          next = function () {
+            expect(req.errorHandler).to.equal('errorHandler')
+            done()
+          }
+          seq = new ConnectSequence(req, res, next)
+          seq.append(errorEmitter)
+          seq.appendIf(filter, errorHandler)
+          seq.run()
+        })
+
         it('should run the given error handler and skip the normal middlewares', function (done) {
-          var errorHandler = function (err, req, res, next) {
-            if (err) { req.errorHandler = 'errorHandler' }
-            next()
-          }
-          var errorEmitter = function (req, res, next) {
-            req.errorEmitter = 'errorEmitter'
-            next('errorEmitter')
-          }
           next = function () {
             expect(req.mid0).to.equal('mid0')
             expect(req.errorEmitter).to.equal('errorEmitter')
@@ -399,27 +414,16 @@ describe('ConnectSequence', function () {
       describe('when passing a error handler middleware', function () {
         it('should not run the given error handler', function (done) {
           next = function () {
-            expect(res.foo).to.not.equal('bar')
+            expect(req.errorHandler).to.be.undefined
             done()
           }
-          seq.append(function (req, res, next) {
-            next('middleware in error')
-          })
-          seq.appendIf(function (req) {
-            return !req.foo // 'bar'
-          }, function (err, req, res, next) {
-            if (err) {
-              res.foo = req.foo // 'bar'
-            }
-            next()
-          })
+          seq = new ConnectSequence(req, res, next)
+          seq.append(errorEmitter)
+          seq.appendIf(filter, errorHandler)
+          seq.run()
         })
 
         it('should not run any given error handler or normal middlewares', function (done) {
-          var errorHandler = function (err, req, res, next) {
-            if (err) { req.errorHandler = 'errorHandler' }
-            next()
-          }
           var errorEmitter = function (req, res, next) {
             req.errorEmitter = 'errorEmitter'
             next('errorEmitter')
