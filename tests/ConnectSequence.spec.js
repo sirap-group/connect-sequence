@@ -257,9 +257,39 @@ describe('ConnectSequence', function () {
 
   describe('#appendIf()', function () {
     var filter
+    var mid0, mid1, mid2, mid3, mid4
+    var errorEmitter, errorHandler
 
     beforeEach(function () {
       filter = function (req) { return !!req.foo }
+      errorEmitter = function (req, res, next) {
+        req.errorEmitter = 'errorEmitter'
+        next('errorEmitter')
+      }
+      errorHandler = function (err, req, res, next) {
+        if (err) { req.errorHandler = 'errorHandler' }
+        next()
+      }
+      mid0 = function (req, res, next) {
+        req.mid0 = 'mid0'
+        next()
+      }
+      mid1 = function (req, res, next) {
+        req.mid1 = 'mid1'
+        next()
+      }
+      mid2 = function (req, res, next) {
+        req.mid2 = 'mid2'
+        next()
+      }
+      mid3 = function (req, res, next) {
+        req.mid3 = 'mid3'
+        next()
+      }
+      mid4 = function (req, res, next) {
+        req.mid4 = 'mid4'
+        next()
+      }
     })
 
     it('should be chainable', function () {
@@ -281,7 +311,7 @@ describe('ConnectSequence', function () {
       }).to.not.throw(MissingArgumentError)
     })
 
-    it('should throw `TypeError` if the first arguments is not a function', function () {
+    it('should throw `TypeError` if the first argument is not a function', function () {
       expect(function () {
         seq.appendIf('not a function', mid)
       }).to.throw(TypeError)
@@ -291,30 +321,41 @@ describe('ConnectSequence', function () {
       }).to.not.throw(Error)
     })
 
-    it('should throw `TypeError` if second first arguments is not a function', function () {
+    it('should throw `TypeError` if any of the folowing arguments is not a function', function () {
       expect(function () {
         seq.appendIf(filter, 'not a function')
       }).to.throw(TypeError)
 
       expect(function () {
-        seq.appendIf(filter, mid)
+        seq.appendIf(filter, mid, 'not a function')
+      }).to.throw(TypeError)
+
+      expect(function () {
+        seq.appendIf(filter, mid, 'not a function', mid)
+      }).to.throw(TypeError)
+
+      expect(function () {
+        seq.appendIf(filter, mid, mid, mid)
       }).to.not.throw(Error)
     })
 
     describe('when the previous condition on `req` is `true`', function () {
+      beforeEach(function () {
+        filter = function (req) { return true }
+      })
+
       describe('when passing a normal middleware', function () {
-        it('should run the given middleware', function (done) {
+        it('should run the given middlewares', function (done) {
           next = function () {
-            expect(res.foo).to.equal('bar')
+            expect(req.mid0).to.equal('mid0')
+            expect(req.mid1).to.equal('mid1')
+            expect(req.mid2).to.equal('mid2')
+            expect(req.mid3).to.equal('mid3')
+            expect(req.mid4).to.equal('mid4')
             done()
           }
           seq = new ConnectSequence(req, res, next)
-          seq.appendIf(function (req) {
-            return req.foo === 'bar'
-          }, function (req, res, next) {
-            res.foo = req.foo // 'bar'
-            next()
-          })
+          seq.appendIf(filter, mid0, mid1, mid2, mid3, mid4)
           seq.run()
         })
       })
@@ -322,41 +363,50 @@ describe('ConnectSequence', function () {
       describe('when passing a error handler middleware', function () {
         it('should run the given error handler', function (done) {
           next = function () {
-            expect(res.foo).to.equal('bar')
+            expect(req.errorHandler).to.equal('errorHandler')
             done()
           }
           seq = new ConnectSequence(req, res, next)
-          seq.append(function (req, res, next) {
-            next('middleware in error')
-          })
-          seq.appendIf(function (req) {
-            return req.foo === 'bar'
-          }, function (err, req, res, next) {
-            if (err) {
-              res.foo = req.foo // 'bar'
-            }
-            next()
-          })
+          seq.append(errorEmitter)
+          seq.appendIf(filter, errorHandler)
+          seq.run()
+        })
+
+        it('should run the given error handler and skip the normal middlewares', function (done) {
+          next = function () {
+            expect(req.mid0).to.equal('mid0')
+            expect(req.errorEmitter).to.equal('errorEmitter')
+            expect(req.mid1).to.be.undefined
+            expect(req.mid2).to.be.undefined
+            expect(req.errorHandler).to.equal('errorHandler')
+            expect(req.mid3).to.equal('mid3')
+            done()
+          }
+          filter = function (req) { return true }
+          seq = new ConnectSequence(req, res, next)
+          seq.appendIf(filter, mid0, errorEmitter, mid1, mid2, errorHandler, mid3)
           seq.run()
         })
       })
     })
 
     describe('when the previous condition on `req` is `false`', function () {
+      beforeEach(function () {
+        filter = function (req) { return false }
+      })
+
       describe('when passing a normal middleware', function () {
-        it('should not run the given middleware', function (done) {
+        it('should not run the given middlewares', function (done) {
           next = function () {
-            expect(res.foo).to.not.equal('bar')
-            expect(res.foo).to.be.undefined
+            expect(req.mid0).to.be.undefined
+            expect(req.mid1).to.be.undefined
+            expect(req.mid2).to.be.undefined
+            expect(req.mid3).to.be.undefined
+            expect(req.mid4).to.be.undefined
             done()
           }
           seq = new ConnectSequence(req, res, next)
-          seq.appendIf(function (req) {
-            return !req.foo
-          }, function (req, res, next) {
-            res.foo = req.foo // 'bar'
-            next()
-          })
+          seq.appendIf(filter, mid0, mid1, mid2, mid3, mid4)
           seq.run()
         })
       })
@@ -364,21 +414,28 @@ describe('ConnectSequence', function () {
       describe('when passing a error handler middleware', function () {
         it('should not run the given error handler', function (done) {
           next = function () {
-            expect(res.foo).to.not.equal('bar')
+            expect(req.errorHandler).to.be.undefined
             done()
           }
           seq = new ConnectSequence(req, res, next)
-          seq.append(function (req, res, next) {
-            next('middleware in error')
-          })
-          seq.appendIf(function (req) {
-            return !req.foo // 'bar'
-          }, function (err, req, res, next) {
-            if (err) {
-              res.foo = req.foo // 'bar'
-            }
-            next()
-          })
+          seq.append(errorEmitter)
+          seq.appendIf(filter, errorHandler)
+          seq.run()
+        })
+
+        it('should not run any given error handler or normal middlewares', function (done) {
+          next = function () {
+            expect(req.mid0).to.equal('mid0')
+            expect(req.errorEmitter).to.equal('errorEmitter')
+            expect(req.mid1).to.be.undefined
+            expect(req.mid2).to.be.undefined
+            expect(req.errorHandler).to.be.undefined
+            expect(req.mid3).to.be.undefined
+            done()
+          }
+          seq = new ConnectSequence(req, res, next)
+          seq.append(mid0, errorEmitter)
+          seq.appendIf(filter, mid1, mid2, errorHandler, mid3)
           seq.run()
         })
       })
