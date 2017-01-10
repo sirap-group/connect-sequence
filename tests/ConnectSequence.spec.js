@@ -257,9 +257,30 @@ describe('ConnectSequence', function () {
 
   describe('#appendIf()', function () {
     var filter
+    var mid0, mid1, mid2, mid3, mid4
 
     beforeEach(function () {
       filter = function (req) { return !!req.foo }
+      mid0 = function (req, res, next) {
+        req.mid0 = 'mid0'
+        next()
+      }
+      mid1 = function (req, res, next) {
+        req.mid1 = 'mid1'
+        next()
+      }
+      mid2 = function (req, res, next) {
+        req.mid2 = 'mid2'
+        next()
+      }
+      mid3 = function (req, res, next) {
+        req.mid3 = 'mid3'
+        next()
+      }
+      mid4 = function (req, res, next) {
+        req.mid4 = 'mid4'
+        next()
+      }
     })
 
     it('should be chainable', function () {
@@ -312,7 +333,6 @@ describe('ConnectSequence', function () {
     describe('when the previous condition on `req` is `true`', function () {
       describe('when passing a normal middleware', function () {
         it('should run the given middlewares', function (done) {
-          var mid0, mid1, mid2, mid3, mid4
           next = function () {
             expect(req.mid0).to.equal('mid0')
             expect(req.mid1).to.equal('mid1')
@@ -321,34 +341,7 @@ describe('ConnectSequence', function () {
             expect(req.mid4).to.equal('mid4')
             done()
           }
-          mid0 = function (req, res, next) {
-            console.log('mid0')
-            req.mid0 = 'mid0'
-            next()
-          }
-          mid1 = function (req, res, next) {
-            console.log('mid1')
-            req.mid1 = 'mid1'
-            next()
-          }
-          mid2 = function (req, res, next) {
-            console.log('mid2')
-            req.mid2 = 'mid2'
-            next()
-          }
-          mid3 = function (req, res, next) {
-            console.log('mid3')
-            req.mid3 = 'mid3'
-            next()
-          }
-          mid4 = function (req, res, next) {
-            console.log('mid4')
-            req.mid4 = 'mid4'
-            next()
-          }
-          filter = function (req) {
-            return true
-          }
+          filter = function (req) { return true }
           seq = new ConnectSequence(req, res, next)
           seq.appendIf(filter, mid0, mid1, mid2, mid3, mid4)
           seq.run()
@@ -356,23 +349,27 @@ describe('ConnectSequence', function () {
       })
 
       describe('when passing a error handler middleware', function () {
-        it('should run the given error handler', function (done) {
+        it('should run the given error handler and skip the normal middlewares', function (done) {
+          var errorHandler = function (err, req, res, next) {
+            if (err) { req.errorHandler = 'errorHandler' }
+            next()
+          }
+          var errorEmitter = function (req, res, next) {
+            req.errorEmitter = 'errorEmitter'
+            next('errorEmitter')
+          }
           next = function () {
-            expect(res.foo).to.equal('bar')
+            expect(req.mid0).to.equal('mid0')
+            expect(req.errorEmitter).to.equal('errorEmitter')
+            expect(req.mid1).to.be.undefined
+            expect(req.mid2).to.be.undefined
+            expect(req.errorHandler).to.equal('errorHandler')
+            expect(req.mid3).to.equal('mid3')
             done()
           }
+          filter = function (req) { return true }
           seq = new ConnectSequence(req, res, next)
-          seq.append(function (req, res, next) {
-            next('middleware in error')
-          })
-          seq.appendIf(function (req) {
-            return req.foo === 'bar'
-          }, function (err, req, res, next) {
-            if (err) {
-              res.foo = req.foo // 'bar'
-            }
-            next()
-          })
+          seq.appendIf(filter, mid0, errorEmitter, mid1, mid2, errorHandler, mid3)
           seq.run()
         })
       })
