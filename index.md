@@ -45,6 +45,10 @@ With node package manager (recommanded but not required)
 
     npm install --save connect-sequence
 
+## API reference
+
+[ConnectSequence API reference](api.md)
+
 ## Usage
 
 > The following example is stupid simple.
