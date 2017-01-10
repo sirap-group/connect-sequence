@@ -46,6 +46,11 @@ describe('ConnectSequence', function () {
       expect(ConnectSequence.prototype.appendList).to.be.a('function')
     })
 
+    it('should have a "appendListIf" method', function () {
+      expect(ConnectSequence.prototype).to.have.property('appendListIf')
+      expect(ConnectSequence.prototype.appendListIf).to.be.a('function')
+    })
+
     it('should have a "appendIf" method', function () {
       expect(ConnectSequence.prototype).to.have.property('appendIf')
       expect(ConnectSequence.prototype.appendIf).to.be.a('function')
