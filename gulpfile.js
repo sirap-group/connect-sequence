@@ -106,7 +106,7 @@ gulp.task('jsdoc', function () {
 gulp.task('default', ['test'])
 
 gulp.task('watch', function () {
-  gulp.watch([ './tests/**/*.js', './lib/**/*.js' ], ['test'])
+  gulp.watch([ './tests/**/*.js', './lib/**/*.js' ], ['test', 'jsdoc'])
 })
 
 function releaseIfHeadOnMaster (done) {
