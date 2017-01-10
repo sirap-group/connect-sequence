@@ -2,6 +2,8 @@ var gulp = require('gulp')
 var yargs = require('yargs')
 var del = require('del')
 var chalk = require('chalk')
+var fs = require('fs-then-native')
+var jsdoc2md = require('jsdoc-to-markdown')
 
 var standard = require('gulp-standard-bundle')
 var mocha = require('gulp-mocha')
@@ -96,10 +98,15 @@ gulp.task('release', ['bump'], function (done) {
   })
 })
 
+gulp.task('jsdoc', function () {
+  return jsdoc2md.render({ files: 'lib/*.js' })
+    .then(output => fs.writeFile('api.md', output))
+})
+
 gulp.task('default', ['test'])
 
 gulp.task('watch', function () {
-  gulp.watch([ './tests/**/*.js', './lib/**/*.js' ], ['test'])
+  gulp.watch([ './tests/**/*.js', './lib/**/*.js' ], ['test', 'jsdoc'])
 })
 
 function releaseIfHeadOnMaster (done) {
