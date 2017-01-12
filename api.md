@@ -30,7 +30,7 @@ Run sequencially each appended middleware, using the next argument as the final 
 <a name="ConnectSequence+append"></a>
 
 ### connectSequence.append(...middlewares) ⇒ <code>[ConnectSequence](#ConnectSequence)</code>
-Append an arbitrary number of middlewares as argument list or as an array
+Append an arbitrary number of middlewares as an argument list
 
 **Kind**: instance method of <code>[ConnectSequence](#ConnectSequence)</code>  
 **Returns**: <code>[ConnectSequence](#ConnectSequence)</code> - a reference to the instance to be chainable  
@@ -46,7 +46,7 @@ Append an arbitrary number of middlewares as argument list or as an array
 <a name="ConnectSequence+appendList"></a>
 
 ### connectSequence.appendList(middlewares) ⇒ <code>[ConnectSequence](#ConnectSequence)</code>
-Append many middlewares in an array
+Append an arbitrary number of middlewares as an array
 
 **Kind**: instance method of <code>[ConnectSequence](#ConnectSequence)</code>  
 **Returns**: <code>[ConnectSequence](#ConnectSequence)</code> - a reference to the instance to be chainable  
@@ -58,7 +58,7 @@ Append many middlewares in an array
 <a name="ConnectSequence+appendIf"></a>
 
 ### connectSequence.appendIf(filter, ...middlewares) ⇒ <code>[ConnectSequence](#ConnectSequence)</code>
-Append a list of middlewares as argument list if the filter pass the first time
+Append an arbitrary number of middlewares as an argument list if the filter pass at runtime of the first middleware in the given list
 
 **Kind**: instance method of <code>[ConnectSequence](#ConnectSequence)</code>  
 **Returns**: <code>[ConnectSequence](#ConnectSequence)</code> - a reference to the instance to be chainable  
@@ -71,7 +71,7 @@ Append a list of middlewares as argument list if the filter pass the first time
 <a name="ConnectSequence+appendListIf"></a>
 
 ### connectSequence.appendListIf(filter, middlewares) ⇒ <code>[ConnectSequence](#ConnectSequence)</code>
-Append many middlewares in an array if the filter pass the first time
+Append an arbitrary number of middlewares as an array if the filter pass at runtime of the first middleware in the given list
 
 **Kind**: instance method of <code>[ConnectSequence](#ConnectSequence)</code>  
 **Returns**: <code>[ConnectSequence](#ConnectSequence)</code> - a reference to the instance to be chainable  
