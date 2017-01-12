@@ -1,3 +1,18 @@
+## Classes
+
+<dl>
+<dt><a href="#ConnectSequence">ConnectSequence</a></dt>
+<dd></dd>
+</dl>
+
+## Typedefs
+
+<dl>
+<dt><a href="#middlewareFilter">middlewareFilter</a> ⇒ <code>Boolean</code></dt>
+<dd><p>A middleware filter function run at the middleware runtime, causing the middleware or middleware list should be ran or skiped</p>
+</dd>
+</dl>
+
 <a name="ConnectSequence"></a>
 
 ## ConnectSequence
@@ -78,6 +93,17 @@ Append an arbitrary number of middlewares as an array if the filter pass at runt
 
 | Param | Type | Description |
 | --- | --- | --- |
-| filter | <code>function</code> | A filter function on the req object |
+| filter | <code>[middlewareFilter](#middlewareFilter)</code> | A filter function on the req object |
 | middlewares | <code>Array.&lt;function()&gt;</code> | An array of middleware functions (or errorHandler middlewares) |
+
+<a name="middlewareFilter"></a>
+
+## middlewareFilter ⇒ <code>Boolean</code>
+A middleware filter function run at the middleware runtime, causing the middleware or middleware list should be ran or skiped
+
+**Kind**: global typedef  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| req | <code>IncomingMessage</code> | The express request object |
 
