@@ -18,6 +18,16 @@
 
 A node.js module to run connect-like middlewares in sequence
 
+- [What is `connect-sequence`](#what-is-connect-sequence)
+- [Installation](#installation)
+- [API Reference](#api-reference)
+- [Usage](#usage)
+- [Contribute](#contribute)
+    - [Development](#development)
+- [Credits](#credits)
+- [Copyright](#copyright)
+- [License](#license)
+
 ## What is `connect-sequence`
 
 This module is intended to be used in a [`connect`](https://github.com/senchalabs/connect) or [`express`](http://expressjs.com) application.
