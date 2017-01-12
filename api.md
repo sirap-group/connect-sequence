@@ -4,20 +4,19 @@
 **Kind**: global class  
 
 * [ConnectSequence](#ConnectSequence)
-    * [new ConnectSequence([middlewareList], req, res, next)](#new_ConnectSequence_new)
+    * [new ConnectSequence(req, res, next)](#new_ConnectSequence_new)
     * [.run()](#ConnectSequence+run) ⇒ <code>undefined</code>
     * [.append(...middlewares)](#ConnectSequence+append) ⇒ <code>[ConnectSequence](#ConnectSequence)</code>
     * [.appendList(middlewares)](#ConnectSequence+appendList) ⇒ <code>[ConnectSequence](#ConnectSequence)</code>
-    * [.appendIf(filter, middlewares)](#ConnectSequence+appendIf) ⇒ <code>[ConnectSequence](#ConnectSequence)</code>
+    * [.appendIf(filter, ...middlewares)](#ConnectSequence+appendIf) ⇒ <code>[ConnectSequence](#ConnectSequence)</code>
     * [.appendListIf(filter, middlewares)](#ConnectSequence+appendListIf) ⇒ <code>[ConnectSequence](#ConnectSequence)</code>
 
 <a name="new_ConnectSequence_new"></a>
 
-### new ConnectSequence([middlewareList], req, res, next)
+### new ConnectSequence(req, res, next)
 
 | Param | Type | Description |
 | --- | --- | --- |
-| [middlewareList] | <code>Array.&lt;function()&gt;</code> | A list of middlewares to run |
 | req | <code>object</code> | The request object |
 | res | <code>object</code> | The response object |
 | next | <code>function</code> | The next middleware |
@@ -42,7 +41,7 @@ Append an arbitrary number of middlewares as argument list or as an array
 
 | Param | Type | Description |
 | --- | --- | --- |
-| ...middlewares | <code>function</code> | a list of middlewares |
+| ...middlewares | <code>function</code> | A list of middleware functions (or errorHandler middlewares) |
 
 <a name="ConnectSequence+appendList"></a>
 
@@ -52,13 +51,13 @@ Append many middlewares in an array
 **Kind**: instance method of <code>[ConnectSequence](#ConnectSequence)</code>  
 **Returns**: <code>[ConnectSequence](#ConnectSequence)</code> - a reference to the instance to be chainable  
 
-| Param | Type |
-| --- | --- |
-| middlewares | <code>Array.&lt;function()&gt;</code> | 
+| Param | Type | Description |
+| --- | --- | --- |
+| middlewares | <code>Array.&lt;function()&gt;</code> | An array of middleware functions (or errorHandler middlewares) |
 
 <a name="ConnectSequence+appendIf"></a>
 
-### connectSequence.appendIf(filter, middlewares) ⇒ <code>[ConnectSequence](#ConnectSequence)</code>
+### connectSequence.appendIf(filter, ...middlewares) ⇒ <code>[ConnectSequence](#ConnectSequence)</code>
 Append a list of middlewares as argument list if the filter pass the first time
 
 **Kind**: instance method of <code>[ConnectSequence](#ConnectSequence)</code>  
@@ -67,7 +66,7 @@ Append a list of middlewares as argument list if the filter pass the first time
 | Param | Type | Description |
 | --- | --- | --- |
 | filter | <code>function</code> | A filter function (returning a Boolean) |
-| middlewares | <code>function</code> | A middleware list of functions (calling its third argument as callback) |
+| ...middlewares | <code>function</code> | A list of middleware functions (or errorHandler middlewares) |
 
 <a name="ConnectSequence+appendListIf"></a>
 
@@ -80,5 +79,5 @@ Append many middlewares in an array if the filter pass the first time
 | Param | Type | Description |
 | --- | --- | --- |
 | filter | <code>function</code> | A filter function on the req object |
-| middlewares | <code>Array.&lt;function()&gt;</code> | An array of middlewares to append to the sequence |
+| middlewares | <code>Array.&lt;function()&gt;</code> | An array of middleware functions (or errorHandler middlewares) |
 
